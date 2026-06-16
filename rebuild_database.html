@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>五惠資料庫重建工具</title>
+<style>
+body{font-family:sans-serif;max-width:700px;margin:40px auto;padding:20px;background:#f0f4f8}
+.card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.1);margin-bottom:16px}
+h2{color:#1e3a8a;margin-bottom:6px}
+.sub{color:#64748b;font-size:13px;margin-bottom:16px}
+.warn{background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:12px;font-size:13px;margin-bottom:14px;color:#92400e}
+.progress-wrap{margin:14px 0}
+.prog-bg{background:#e2e8f0;border-radius:6px;height:12px;overflow:hidden;margin-bottom:6px}
+.prog-fill{background:linear-gradient(90deg,#1e3a8a,#3b82f6);height:100%;border-radius:6px;transition:width .3s;width:0%}
+.prog-lbl{font-size:12px;color:#64748b;font-family:monospace}
+.log{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:14px;font-size:12px;font-family:monospace;height:200px;overflow-y:auto;margin-top:12px}
+.log-ok{color:#34d399}.log-err{color:#f87171}.log-info{color:#60a5fa}
+.btn{width:100%;padding:14px;border-radius:9px;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .2s;margin-bottom:8px}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-p{background:#1e3a8a;color:#fff}
+.btn-p:hover{background:#1e40af}
+.btn:disabled{background:#94a3b8;cursor:not-allowed}
+.step{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:13px}
+.step:last-child{border:none}
+.step-num{width:24px;height:24px;border-radius:50%;background:#1e3a8a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.step-done .step-num{background:#15803d}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>🔄 五惠資料庫重建工具</h2>
+  <div class="sub">將 B001~B024 全部資料以統一格式寫入主資料庫分頁</div>
+  <div class="warn">
+    ⚠️ <b>執行前請確認：</b><br>
+    1. 此工具會清空「主資料庫」分頁並重新寫入<br>
+    2. 執行後舊資料將被替換為新格式<br>
+    3. 請先確認 Google Sheets 已備份
+  </div>
+
+  <div style="margin-bottom:14px">
+    <div class="step" id="step1"><div class="step-num">1</div><div>清空主資料庫分頁</div></div>
+    <div class="step" id="step2"><div class="step-num">2</div><div>寫入標題列</div></div>
+    <div class="step" id="step3"><div class="step-num">3</div><div>逐筆寫入 B001~B024（共24筆）</div></div>
+    <div class="step" id="step4"><div class="step-num">4</div><div>完成確認</div></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="prog-bg"><div class="prog-fill" id="prog"></div></div>
+    <div class="prog-lbl" id="prog-lbl">準備就緒</div>
+  </div>
+
+  <button class="btn btn-p" id="btn-start" onclick="startRebuild()">🚀 開始重建資料庫</button>
+  <div class="log" id="log"><span class="log-info">等待開始...</span></div>
+</div>
+
+<script>
+var API='https://script.google.com/macros/s/AKfycbzp8GhrGvXay8HiQFBHDzmz6zZY1X5YYlr0TB_XBW6B-iueOyOHAUNJSSvF6qTUZAAdqA/exec';
+var SHEET_NAME='\u300a\u4e94\u60e0\u300b\u667a\u6155\u539f\u6599\u6b65\u7559\u7387\u7ba1\u7406\u7cfb\u7d71_\u4e3b\u8cc7\u6599\u5eab';
+
+var BATCHES=[
+  {batchId:'B001',date:'2024/09/06',fruit:'\u67da\u5b50',op:'\u5289\u67da\u5b50',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:2000,totalOut:1339,defect:26,opLoss:635,yieldRate:66.95,defectRate:1.3,lossRate:31.75,workers:20,grandMH:70,efficiency:7.9,pretreat:'\u7c97\u78e8',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/6\u5eca\u5167\u4eba\u54e1\u4f5c\u696d \u542b\u7c97\u78e8 \u67da\u76ae\u982485kg'},
+  {batchId:'B002',date:'2024/09/07',fruit:'\u67da\u5b50',op:'\u5289\u67da\u5b50',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:5000,totalOut:3409,defect:83,opLoss:1508,yieldRate:68.18,defectRate:1.66,lossRate:30.16,workers:0,grandMH:0,efficiency:0,pretreat:'\u7c97\u78e8',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/7-9/8 \u5916\u52de\u4f5c\u696d \u7121\u5de5\u6642\u6578\u64da'},
+  {batchId:'B003',date:'2024/09/11',fruit:'\u67da\u5b50',op:'\u5289\u67da\u5b50',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:1000,totalOut:631,defect:29,opLoss:340,yieldRate:63.1,defectRate:2.9,lossRate:34.0,workers:0,grandMH:0,efficiency:0,pretreat:'\u7c97\u78e8',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/11-9/13 \u5916\u52de\u4f5c\u696d'},
+  {batchId:'B004',date:'2024/09/13',fruit:'\u67da\u5b50',op:'\u5289\u67da\u5b50',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:7200,totalOut:4992,defect:133,opLoss:2075,yieldRate:69.33,defectRate:1.85,lossRate:28.82,workers:0,grandMH:0,efficiency:0,pretreat:'\u7c97\u78e8',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/13 \u958b\u653e\u9109\u89aa\u5289\u67da\u65e5'},
+  {batchId:'B005',date:'2024/09/18',fruit:'\u67da\u5b50',op:'\u5289\u67da\u5b50',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:1000,totalOut:677,defect:21.7,opLoss:301.3,yieldRate:67.7,defectRate:2.17,lossRate:30.13,workers:0,grandMH:0,efficiency:0,pretreat:'\u7c97\u78e8',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/18 \u5eca\u5167\u4eba\u54e1 \u542b\u7c97\u78e8'},
+  {batchId:'B006',date:'2024/09/06',fruit:'\u67da\u5b50',op:'\u5207\u67da\u76ae\u689d',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:400,totalOut:400,defect:19,opLoss:0,yieldRate:100,defectRate:4.75,lossRate:0,workers:4,grandMH:26,efficiency:3.8,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/6 \u5b78\u7fd2\u6548\u61c9'},
+  {batchId:'B007',date:'2024/09/08',fruit:'\u67da\u5b50',op:'\u5207\u67da\u76ae\u689d',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:105,totalOut:105,defect:5,opLoss:0,yieldRate:100,defectRate:4.76,lossRate:0,workers:2,grandMH:5,efficiency:10.5,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/8'},
+  {batchId:'B008',date:'2024/09/18',fruit:'\u67da\u5b50',op:'\u5207\u67da\u76ae\u689d',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:227.5,totalOut:227.5,defect:16,opLoss:0,yieldRate:100,defectRate:7.03,lossRate:0,workers:2,grandMH:11,efficiency:10.3,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/18'},
+  {batchId:'B009',date:'2024/09/09',fruit:'\u67da\u5b50',op:'\u5207\u67da\u76ae\u7d72',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:400,totalOut:400,defect:16,opLoss:0,yieldRate:100,defectRate:4.0,lossRate:0,workers:4,grandMH:24,efficiency:4.2,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/9 \u6548\u7387\u504f\u4f4e'},
+  {batchId:'B010',date:'2024/09/10',fruit:'\u67da\u5b50',op:'\u5207\u67da\u76ae\u7d72',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:200,totalOut:200,defect:8,opLoss:0,yieldRate:100,defectRate:4.0,lossRate:0,workers:2,grandMH:13,efficiency:7.7,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/10'},
+  {batchId:'B011',date:'2024/09/11',fruit:'\u67da\u5b50',op:'\u5207\u67da\u76ae\u7d72',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:220,totalOut:220,defect:7,opLoss:0,yieldRate:100,defectRate:3.18,lossRate:0,workers:2,grandMH:14,efficiency:7.9,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/11'},
+  {batchId:'B012',date:'2024/09/12',fruit:'\u67da\u5b50',op:'\u5207\u67da\u76ae\u7d72',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:323,totalOut:323,defect:11,opLoss:0,yieldRate:100,defectRate:3.41,lossRate:0,workers:2,grandMH:16,efficiency:10.1,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/12'},
+  {batchId:'B013',date:'2024/09/13',fruit:'\u67da\u5b50',op:'\u5207\u67da\u76ae\u7d72',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:363,totalOut:363,defect:23,opLoss:0,yieldRate:100,defectRate:6.34,lossRate:0,workers:4,grandMH:25,efficiency:3.6,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/13 \u958b\u653e\u65e5\u6548\u7387\u504f\u4f4e'},
+  {batchId:'B014',date:'2024/09/14',fruit:'\u67da\u5b50',op:'\u5207\u67da\u76ae\u7d72',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:140,totalOut:140,defect:8,opLoss:0,yieldRate:100,defectRate:5.71,lossRate:0,workers:2,grandMH:6,efficiency:11.7,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/14'},
+  {batchId:'B015',date:'2024/09/18',fruit:'\u67da\u5b50',op:'\u5289\u67da\u8089',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:156,totalOut:156,defect:78,opLoss:0,yieldRate:100,defectRate:50.0,lossRate:0,workers:12,grandMH:30,efficiency:0.4,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'9/18 \u5289\u67da\u8089 \u67da\u56ca78KG\u8a08\u5165\u4e0d\u826f\u54c1'},
+  {batchId:'B016',date:'2024/11/21',fruit:'\u860b\u679c',op:'\u860b\u679c-\u5207\u524a',loc:'2\u5eca3F\u539f\u6599',supplier:'\u798f\u58fd\u5c71\u8fb2\u5834',rawkg:972,totalOut:834.15,defect:137.85,opLoss:0,yieldRate:85.82,defectRate:14.18,lossRate:0,workers:23,grandMH:61.2,efficiency:15.891,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'11/21 972KG'},
+  {batchId:'B017',date:'2024/12/11',fruit:'\u860b\u679c',op:'\u860b\u679c-\u5207\u524a',loc:'2\u5eca3F\u539f\u6599',supplier:'\u798f\u58fd\u5c71\u8fb2\u5834',rawkg:252,totalOut:218.4,defect:33.6,opLoss:0,yieldRate:86.67,defectRate:13.33,lossRate:0,workers:13,grandMH:23,efficiency:10.957,pretreat:'\u6e05\u6d17',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'12/11 252KG'},
+  {batchId:'B018',date:'2024/08/16',fruit:'\u5947\u7570\u679c',op:'\u5947\u7570\u679c-\u5207\u524a',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:994,totalOut:812,defect:182,opLoss:0,yieldRate:81.69,defectRate:18.31,lossRate:0,workers:16,grandMH:138,efficiency:7.203,pretreat:'',condition:'\u826f\u597d',texture:'\u504f\u786c',notes:'113\u5e748/16 \u679c\u8089\u504f\u786c'},
+  {batchId:'B019',date:'2025/09/01',fruit:'\u5947\u7570\u679c',op:'\u5947\u7570\u679c-\u5207\u524a',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:2243.8,totalOut:1770,defect:473.8,opLoss:0,yieldRate:78.89,defectRate:21.12,lossRate:0,workers:33,grandMH:344,efficiency:6.52,pretreat:'',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'114\u5e749/1~9/2 \u679c\u8089\u8edf\u786c\u53c3\u96dc'},
+  {batchId:'B020',date:'2025/07/16',fruit:'\u829d\u679c',op:'\u829d\u679c-\u5207\u524a',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:2400,totalOut:1632,defect:768,opLoss:0,yieldRate:68.0,defectRate:32.0,lossRate:0,workers:36,grandMH:221,efficiency:10.86,pretreat:'\u6e05\u6d17',condition:'\u666e\u901a',texture:'\u504f\u8edf',notes:'114\u5e747/16 2400KG 108\u7c43'},
+  {batchId:'B021',date:'2025/02/13',fruit:'\u8607\u8403',op:'\u8607\u8403-\u5207\u524a',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:3900,totalOut:3575.5,defect:324.5,opLoss:0,yieldRate:91.68,defectRate:8.32,lossRate:0,workers:44,grandMH:80.7,efficiency:48.347,pretreat:'',condition:'\u826f\u597d',texture:'\u504f\u786c',notes:'114\u5e742/13 3900KG \u9577\u5ea6\u526025~40cm'},
+  {batchId:'B022',date:'2026/02/24',fruit:'\u8607\u8403',op:'\u8607\u8403-\u5207\u524a',loc:'2\u5eca3F\u539f\u6599',supplier:'',rawkg:4097.4,totalOut:3765,defect:332.4,opLoss:0,yieldRate:91.89,defectRate:8.11,lossRate:0,workers:32,grandMH:100.1,efficiency:40.94,pretreat:'',condition:'\u826f\u597d',texture:'\u504f\u786c',notes:'115\u5e742/24 \u982d\u5c3e\u7121\u5207\u524a 20~45cm'},
+  {batchId:'B023',date:'2026/02/10',fruit:'\u6a58\u5b50',op:'\u5289\u6a58\u5b50\uff08\u73bb\u7483\u74f6\uff09',loc:'1\u5eca1F\u21922\u5eca3F\u539f\u6599',supplier:'',rawkg:480,totalOut:314,defect:7,opLoss:0,yieldRate:65.4,defectRate:1.5,lossRate:0,workers:21,grandMH:82,efficiency:6.86,pretreat:'\u6bba\u83c1',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'115\u5e742/10 \u73bb\u7483\u74f6\u9700\u6c42 \u679c\u76ae138KG\u7cd6\u6f2c\u6854\u76ae \u679c\u6c4121KG \u6709\u6548\u5229\u7528\u738798.5%'},
+  {batchId:'B024',date:'2026/02/10',fruit:'\u6a58\u5b50',op:'\u6a58\u5b50\u6a68\u6c41\uff08NY\u88cb\uff09',loc:'1\u5eca1F\u871c\u9944\u5340',supplier:'',rawkg:246,totalOut:106,defect:10,opLoss:0,yieldRate:43.1,defectRate:4.1,lossRate:0,workers:21,grandMH:36.2,efficiency:10.18,pretreat:'\u6a68\u6c41\u88dd\u6876/\u6bba\u83c1\u6f02\u6c34',condition:'\u826f\u597d',texture:'\u9069\u4e2d',notes:'115\u5e742/10~2/11 NY\u88cb\u9700\u6c42 \u679c\u6c41106KG \u679c\u76ae130KG\u7cd6\u6f2c\u6854\u76ae \u6709\u6548\u5229\u7528\u738795.9%'}
+];
+
+var current=0;
+var logEl,progEl,progLbl;
+
+function log(msg,cls){
+  var line=document.createElement('div');
+  line.className=cls||'';
+  line.textContent=msg;
+  logEl.appendChild(line);
+  logEl.scrollTop=logEl.scrollHeight;
+}
+
+function setProgress(pct,lbl){
+  progEl.style.width=pct+'%';
+  progLbl.textContent=lbl;
+}
+
+function markStep(n){
+  var el=document.getElementById('step'+n);
+  if(el){el.classList.add('step-done');el.querySelector('.step-num').textContent='✓';}
+}
+
+async function startRebuild(){
+  var btn=document.getElementById('btn-start');
+  btn.disabled=true;btn.textContent='⏳ 重建中...';
+  logEl=document.getElementById('log');
+  progEl=document.getElementById('prog');
+  progLbl=document.getElementById('prog-lbl');
+  logEl.innerHTML='';
+
+  log('🚀 開始重建資料庫...','log-info');
+  log('目標分頁：'+SHEET_NAME,'log-info');
+
+  // Step 1: Clear sheet via special action
+  log('\n📋 Step 1: 清空主資料庫分頁...','log-info');
+  setProgress(5,'清空分頁中...');
+  try{
+    var clearData={action:'clearSheet',sheetName:SHEET_NAME};
+    var p1=new URLSearchParams();p1.append('data',JSON.stringify(clearData));
+    var r1=await fetch(API,{method:'POST',body:p1});
+    var t1=await r1.text();
+    log('分頁清空完成','log-ok');
+    markStep(1);
+  }catch(e){
+    log('清空失敗，繼續寫入（會覆蓋舊資料）：'+e.message,'log-err');
+    markStep(1);
+  }
+
+  // Step 2: Write header
+  log('\n📋 Step 2: 寫入標題列...','log-info');
+  setProgress(10,'寫入標題列...');
+  markStep(2);
+  log('標題列將由 Apps Script 自動建立','log-ok');
+
+  // Step 3: Write each batch
+  log('\n📋 Step 3: 逐筆寫入資料...','log-info');
+  var success=0,failed=0;
+
+  for(var i=0;i<BATCHES.length;i++){
+    var b=BATCHES[i];
+    var pct=10+Math.round((i/BATCHES.length)*80);
+    setProgress(pct,'寫入 '+b.batchId+' ('+（i+1)+'/'+BATCHES.length+')');
+
+    // Add sheetName to direct to correct sheet
+    var writeData=Object.assign({},b,{targetSheet:SHEET_NAME});
+    var params=new URLSearchParams();
+    params.append('data',JSON.stringify(writeData));
+
+    try{
+      var r=await fetch(API,{method:'POST',body:params});
+      var t=await r.text();
+      var res=JSON.parse(t);
+      if(res.status==='ok'){
+        log('✅ '+b.batchId+' '+b.fruit+' '+b.op+' 寫入成功','log-ok');
+        success++;
+      } else {
+        log('❌ '+b.batchId+' 失敗：'+(res.message||'錯誤'),'log-err');
+        failed++;
+      }
+    }catch(e){
+      log('❌ '+b.batchId+' 例外：'+e.message,'log-err');
+      failed++;
+    }
+    await new Promise(function(r){setTimeout(r,300)});
+  }
+
+  // Step 4: Done
+  markStep(3);
+  setProgress(100,'完成！');
+  markStep(4);
+  log('\n=============================','log-info');
+  log('✅ 完成！成功：'+success+' 筆，失敗：'+failed+' 筆','log-ok');
+  if(failed===0){
+    log('🎉 所有資料已成功寫入主資料庫！','log-ok');
+    btn.textContent='✅ 重建完成';
+    btn.style.background='#15803d';
+  } else {
+    log('⚠️ 有 '+failed+' 筆失敗，請重試','log-err');
+    btn.disabled=false;btn.textContent='🔄 重試';
+  }
+}
+</script>
+</body>
+</html>
