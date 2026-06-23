@@ -30,9 +30,9 @@ body{font-family:'Noto Sans TC','Inter',sans-serif;background:var(--bg);color:va
 ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
 
 /* ══ TOPBAR ══════════════════════════════ */
-.topbar{background:var(--blue);height:68px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(30,58,138,.3)}
+.topbar{background:#2d6a4f;height:68px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(45,106,79,.4)}
 .brand{display:flex;align-items:center;gap:12px}
-.brand-ico{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(59,130,246,.4);flex-shrink:0}
+.brand-ico{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#40916c,#1b4332);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(45,106,79,.4);flex-shrink:0}
 .brand-name{font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px}
 .brand-sub{font-size:10px;color:rgba(255,255,255,.45);letter-spacing:1px;margin-top:1px;font-family:'JetBrains Mono',monospace}
 .tnav-wrap{display:flex;gap:4px}
@@ -52,7 +52,7 @@ body{font-family:'Noto Sans TC','Inter',sans-serif;background:var(--bg);color:va
 
 /* ══ PAGE HEADER ═════════════════════════ */
 .ph{margin-bottom:18px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.ph-title{font-size:20px;font-weight:700;color:var(--blue);margin-bottom:2px}
+.ph-title{font-size:20px;font-weight:700;color:#2d6a4f;margin-bottom:2px}
 .ph-sub{font-size:12px;color:var(--ink4)}
 
 /* ══ STEP TRACKER ════════════════════════ */
@@ -61,14 +61,14 @@ body{font-family:'Noto Sans TC','Inter',sans-serif;background:var(--bg);color:va
 .si:last-child{border-right:none}
 .si.done{background:var(--green-l);color:var(--green-m)}
 .si.done::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:var(--green-m)}
-.si.active{background:var(--blue-l);color:var(--blue);font-weight:600}
-.si.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:var(--blue)}
+.si.active{background:#d8f3dc;color:#2d6a4f;font-weight:600}
+.si.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:#2d6a4f}
 .si-n{font-size:17px;font-weight:700;display:block;line-height:1;margin-bottom:2px;font-family:'JetBrains Mono',monospace}
 
 /* ══ CARD ════════════════════════════════ */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r3);margin-bottom:14px;box-shadow:var(--shadow)}
 .ch{padding:13px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border-radius:var(--r3) var(--r3) 0 0}
-.ct{font-size:14px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:7px}
+.ct{font-size:14px;font-weight:600;color:#2d6a4f;display:flex;align-items:center;gap:7px}
 .cb{padding:18px}
 
 /* ══ FRUIT GRID ══════════════════════════ */
@@ -148,8 +148,8 @@ body{font-family:'Noto Sans TC','Inter',sans-serif;background:var(--bg);color:va
 .btn:hover{background:var(--bg2);color:var(--ink)}
 .btn:active{transform:scale(.98)}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.btn-p{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 2px 8px rgba(30,58,138,.25)}
-.btn-p:hover{background:#1e40af;border-color:#1e40af;box-shadow:0 4px 12px rgba(30,58,138,.35)}
+.btn-p{background:#2d6a4f;color:#fff;border-color:#2d6a4f;box-shadow:0 2px 8px rgba(45,106,79,.25)}
+.btn-p:hover{background:#1b4332;border-color:#1b4332;box-shadow:0 4px 12px rgba(45,106,79,.35)}
 .btn-g{background:var(--green-l);color:var(--green-m);border-color:var(--green-b)}
 .btn-g:hover{background:#dcfce7}
 .btn-r{background:var(--red-l);color:var(--red-m);border-color:var(--red-b)}
@@ -177,13 +177,14 @@ tr:hover td{background:var(--bg2)}
 .br{background:var(--red-l);color:var(--red-m)}
 
 /* ══ FRUIT TAGS (colored) ════════════════ */
-.tag{display:inline-flex;padding:2px 9px;border-radius:4px;font-size:12px;font-weight:500;border:1px solid var(--line)}
+.tag{display:inline-flex;padding:2px 9px;border-radius:4px;font-size:12px;font-weight:500;border:1px solid var(--line);white-space:nowrap}
 .tag-柚子{background:#fefce8;color:#854d0e;border-color:#fde047}
 .tag-蘋果{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
 .tag-芒果{background:#fff7ed;color:#9a3412;border-color:#fdba74}
 .tag-奇異果{background:#f0fdf4;color:#14532d;border-color:#86efac}
 .tag-橘子{background:#fff7ed;color:#7c2d12;border-color:#fb923c}
 .tag-菜頭{background:#f8fafc;color:#475569;border-color:#cbd5e1}
+.tag-蘿蔔{background:#f8fafc;color:#475569;border-color:#cbd5e1}
 .tag-其它{background:#f1f5f9;color:#64748b;border-color:#e2e8f0}
 
 /* ══ ALERTS ══════════════════════════════ */
@@ -254,6 +255,7 @@ tr:hover td{background:var(--bg2)}
   <div class="tnav-wrap">
     <button class="tnav on" onclick="showView('input')" id="tnav-input">📥 資料輸入</button>
     <button class="tnav" onclick="showView('records')" id="tnav-records">🗃️ 批次記錄</button>
+    <a href="dashboard.html" class="tnav" style="text-decoration:none">📊 分析儀表板</a>
   </div>
   <div class="conn-pill"><div class="cdot" id="cdot"></div><span id="ctxt">連線中</span></div>
 </div>
@@ -736,7 +738,11 @@ function submitBatch(){
   var gs=getSegs(),ptw=parseInt(document.getElementById('i-ptw').value)||0;
   var pth=parseInt(document.getElementById('i-pth').value)||0,ptm2=parseInt(document.getElementById('i-ptm').value)||0;
   var ptd=pth+ptm2/60,ptmh=ptw*ptd,gmh=gs.tmh+ptmh,loss=Math.max(0,raw-tot-def);
-  var batch={id:Date.now(),date:date,fruit:ST.fruit,op:ST.op,operator:operator,optype:document.getElementById('i-optype').value,
+  // 產生連續批次ID：找現有最大B號+1
+  var maxN=0;
+  ALL.forEach(function(r){var id=r['批次ID']||r['batchId']||'';var m=id.match(/^B(\d+)$/);if(m)maxN=Math.max(maxN,parseInt(m[1]));});
+  var nextId='B'+String(maxN+1).padStart(3,'0');
+  var batch={id:nextId,date:date,fruit:ST.fruit,op:ST.op,operator:operator,optype:document.getElementById('i-optype').value,
     loc:document.getElementById('i-loc').value,supplier:document.getElementById('i-sup').value,
     rawkg:raw,len:parseFloat(document.getElementById('i-len').value)||0,dia:parseFloat(document.getElementById('i-dia').value)||0,
     condition:document.getElementById('i-cond').value,texture:document.getElementById('i-tex').value,
@@ -821,7 +827,9 @@ function loadRecords(){
 }
 
 function cvtBuiltin(b){
-  return{'批次ID':b.batchId,'作業日期':b.date,'品種':b.fruit,'作業類型':b.op,'作業地點':b.loc,
+  // 品種名稱統一：菜頭→蘿蔔（對齊dashboard）
+  var fruit=b.fruit==='菜頭'?'蘿蔔':b.fruit;
+  return{'批次ID':b.batchId,'作業日期':b.date,'品種':fruit,'作業類型':b.op,'作業地點':b.loc||'',
     '供應商':b.supplier||'','原料重量KG':b.rawkg,'主產出KG':b.totalOut,'不良品KG':b.defect,
     '作業耗損KG':b.opLoss,'步留率%':b.yieldRate,'不良品率%':b.defectRate,'耗損率%':b.lossRate,
     '作業人數':b.workers,'總人力工時hr':b.grandMH,'效率KG/人時':b.efficiency,
@@ -846,35 +854,51 @@ function filterRecs(){
 function v(id){var e=document.getElementById(id);return e?e.value:'';}
 
 function renderRecStats(){
-  if(!ALL.length){document.getElementById('rec-stats').innerHTML='';return;}
-  var tRaw=0,tOut=0;
-  ALL.forEach(function(r){tRaw+=parseFloat(r['原料重量KG'])||0;tOut+=parseFloat(r['主產出KG'])||0;});
-  var avgY=tRaw>0?tOut/tRaw*100:0;
-  document.getElementById('rec-stats').innerHTML=[
-    {l:'總批次數',v:ALL.length,u:'批',c:'var(--blue)'},
-    {l:'總投入量',v:tRaw.toFixed(1),u:'KG',c:'var(--amber-m)'},
-    {l:'整體步留率',v:avgY.toFixed(1),u:'%',c:avgY>=70?'var(--green-m)':avgY>=50?'var(--amber-m)':'var(--red-m)'}
-  ].map(function(s){return'<div class="sc" style="--sc-c:'+s.c+'"><div class="sc-lbl">'+s.l+'</div><div class="sc-val">'+s.v+'</div><div class="sc-unit">'+s.u+'</div></div>';}).join('');
+  document.getElementById('rec-stats').innerHTML='';
 }
 
+// 安全讀取欄位值（同時嘗試有空格/無空格的欄位名）
+function getVal(r, key){
+  var v=r[key];
+  if(v!==undefined&&v!==null&&v!=='')return v;
+  // 嘗試去掉空格
+  var k2=key.replace(/\s/g,'');
+  v=r[k2];
+  if(v!==undefined&&v!==null&&v!=='')return v;
+  return null;
+}
+function getNum(r, key){
+  return parseFloat(getVal(r,key))||0;
+}
+function pctVal(v){
+  // 處理 "91.90%" 字串 或 數字 0.919 或 91.9
+  var s=String(v||'').replace('%','').trim();
+  var n=parseFloat(s)||0;
+  // 若數值小於1，代表是小數格式（如0.919），需乘100
+  if(n>0&&n<1)n=n*100;
+  return n;
+}
 function renderRecs(){
   document.getElementById('rec-tbody').innerHTML=FILT.map(function(r,i){
-    var y=parseFloat(r['步留率%'])||0,yC=y>=70?'bg':y>=50?'by':'br';
+    var y=pctVal(r['步留率%']);
+    var dr=pctVal(r['不良品率%']);
+    var yC=y>=70?'bg':y>=50?'by':'br';
+    var raw=parseFloat(r['原料重量KG'])||0;
     var isB=r['_builtin'];
     return'<tr>'+
-      '<td style="color:var(--ink4);font-size:11px;font-family:JetBrains Mono,monospace">'+(i+1)+'</td>'+
-      '<td>'+fmtDate(r['作業日期'])+'</td>'+
+      '<td style="color:var(--ink4);font-size:13px;font-family:JetBrains Mono,monospace;white-space:nowrap">'+(i+1)+'</td>'+
+      '<td style="font-size:14px;white-space:nowrap">'+fmtDate(r['作業日期'])+'</td>'+
       '<td>'+mkTag(r['品種'])+'</td>'+
-      '<td style="font-size:12px">'+(r['作業類型']||'-')+'</td>'+
-      '<td style="font-size:12px">'+(r['作業地點']||'-')+'</td>'+
-      '<td style="font-family:JetBrains Mono,monospace">'+(r['原料重量KG']||'-')+'</td>'+
+      '<td style="font-size:13px;white-space:nowrap">'+(r['作業類型']||'-')+'</td>'+
+      '<td style="font-size:13px">'+(r['作業地點']||'-')+'</td>'+
+      '<td style="font-family:JetBrains Mono,monospace;font-size:14px;text-align:right">'+(raw>0?raw.toLocaleString():'-')+'</td>'+
       '<td><span class="badge '+yC+'">'+y.toFixed(1)+'%</span></td>'+
-      '<td><span class="badge br">'+(parseFloat(r['不良品率%'])||0).toFixed(1)+'%</span></td>'+
-      '<td style="font-family:JetBrains Mono,monospace">'+(r['效率KG/人時']||'-')+'</td>'+
-      '<td><div class="bgrp">'+
-        '<button class="btn btn-i btn-sm" onclick="showDet('+i+')">詳情</button>'+
-        (!isB?'<button class="btn btn-w btn-sm" onclick="openEditD('+i+')">✏️</button>':'')+
-        (!isB?'<button class="btn btn-r btn-sm" onclick="confirmDelD('+i+')">🗑️</button>':'<span class="badge bb" style="padding:4px 8px;font-size:10px">歷史資料</span>')+
+      '<td><span class="badge br">'+dr.toFixed(1)+'%</span></td>'+
+      '<td style="font-family:JetBrains Mono,monospace;font-size:13px;text-align:right">'+(parseFloat(r['效率KG/人時'])||0).toFixed(2)+'</td>'+
+      '<td><div class="bgrp" style="flex-wrap:nowrap">'+
+        '<button class="btn btn-i btn-sm" onclick="showDet('+i+')" style="white-space:nowrap">詳情</button>'+
+        (!isB?'<button class="btn btn-w btn-sm" onclick="openEditD('+i+')" title="修改此筆記錄">✏️</button>':'')+
+        (!isB?'<button class="btn btn-r btn-sm" onclick="confirmDelD('+i+')" title="刪除此筆記錄">🗑️</button>':'<span class="badge bb" style="padding:4px 8px;font-size:10px;white-space:nowrap">歷史資料</span>')+
       '</div></td></tr>';
   }).join('');
 }
@@ -884,8 +908,8 @@ function clearRF(){['rf-fruit','rf-from','rf-to','rf-q'].forEach(function(id){va
 // ── DETAIL MODAL ──────────────────────────
 function showDet(i){
   CUR=FILT[i];var r=CUR;
-  document.getElementById('det-title').textContent=(r['品種']||'')+' — '+(r['作業類型']||'')+' ('+r['作業日期']+')';
-  var y=parseFloat(r['步留率%'])||0;
+  document.getElementById('det-title').textContent=(r['品種']||'')+' — '+(r['作業類型']||'')+' ('+fmtDate(r['作業日期'])+')';
+  var y=pctVal(r['步留率%']);
   document.getElementById('det-body').innerHTML=
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
     '<div><div style="font-size:11px;color:var(--ink4);font-weight:600;letter-spacing:.5px;margin-bottom:7px">基本資訊</div>'+
@@ -894,14 +918,14 @@ function showDet(i){
     '<div class="ir"><span>供應商</span><span class="iv">'+(r['供應商']||'-')+'</span></div>'+
     '<div class="ir"><span>原料狀況</span><span class="iv">'+(r['原料狀況']||'-')+'</span></div>'+
     '<div class="ir"><span>軟硬度</span><span class="iv">'+(r['原料軟硬度']||'-')+'</span></div>'+
-    '<div class="ir"><span>投入重量</span><span class="iv">'+r['原料重量KG']+' KG</span></div></div>'+
+    '<div class="ir"><span>投入重量</span><span class="iv">'+getNum(r,'原料重量KG').toLocaleString()+' KG</span></div></div>'+
     '<div><div style="font-size:11px;color:var(--ink4);font-weight:600;letter-spacing:.5px;margin-bottom:7px">三層分析</div>'+
     '<div style="background:linear-gradient(145deg,#0f172a,#1e3a5f);border-radius:var(--r2);padding:14px;color:#fff;border:1px solid #1e3a8a">'+
     '<div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12px;color:rgba(255,255,255,.5)">步留率</span><span style="font-size:22px;font-weight:700;font-family:JetBrains Mono,monospace;color:'+(y>=70?'#34d399':y>=50?'#fbbf24':'#f87171')+'">'+y.toFixed(1)+'%</span></div>'+
-    '<div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12px;color:rgba(255,255,255,.5)">不良品率</span><span style="font-size:17px;font-weight:600;color:#f87171">'+(parseFloat(r['不良品率%'])||0).toFixed(1)+'%</span></div>'+
-    '<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:rgba(255,255,255,.5)">作業耗損率</span><span style="font-size:17px;font-weight:600;color:#fbbf24">'+(parseFloat(r['耗損率%'])||0).toFixed(1)+'%</span></div></div>'+
-    '<div class="ir" style="margin-top:8px"><span>產出合計</span><span class="iv">'+r['主產出KG']+' KG</span></div>'+
-    '<div class="ir"><span>不良品</span><span class="iv">'+(r['不良品KG']||0)+' KG</span></div></div></div>'+
+    '<div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12px;color:rgba(255,255,255,.5)">不良品率</span><span style="font-size:17px;font-weight:600;color:#f87171">'+pctVal(r['不良品率%']).toFixed(1)+'%</span></div>'+
+    '<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:rgba(255,255,255,.5)">作業耗損率</span><span style="font-size:17px;font-weight:600;color:#fbbf24">'+pctVal(r['耗損率%']).toFixed(1)+'%</span></div></div>'+
+    '<div class="ir" style="margin-top:8px"><span>產出合計</span><span class="iv">'+getNum(r,'主產出KG').toLocaleString()+' KG</span></div>'+
+    '<div class="ir"><span>不良品</span><span class="iv">'+getNum(r,'不良品KG')+' KG</span></div></div></div>'+
     '<div class="divider"></div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
     '<div><div style="font-size:11px;color:var(--ink4);font-weight:600;letter-spacing:.5px;margin-bottom:7px">人力工時</div>'+
@@ -919,16 +943,22 @@ function showDet(i){
 }
 
 // ── EDIT ──────────────────────────────────
+function toInputDate(d){
+  if(!d)return'';
+  var s=String(d);
+  if(s.indexOf('T')>-1)s=s.slice(0,10);
+  return s.replace(/\//g,'-');
+}
 function openEdit(){
   closeM('det');if(!CUR)return;var r=CUR;
-  document.getElementById('ed-date').value=r['作業日期']||'';
+  document.getElementById('ed-date').value=toInputDate(r['作業日期']);
   document.getElementById('ed-loc').value=r['作業地點']||'';
   document.getElementById('ed-sup').value=r['供應商']||'';
-  document.getElementById('ed-raw').value=r['原料重量KG']||'';
-  document.getElementById('ed-out').value=r['主產出KG']||'';
-  document.getElementById('ed-def').value=r['不良品KG']||'';
-  document.getElementById('ed-wk').value=r['作業人數']||'';
-  document.getElementById('ed-mh').value=r['總人力工時hr']||'';
+  document.getElementById('ed-raw').value=parseFloat(r['原料重量KG'])||'';
+  document.getElementById('ed-out').value=parseFloat(r['主產出KG'])||'';
+  document.getElementById('ed-def').value=parseFloat(r['不良品KG'])||'';
+  document.getElementById('ed-wk').value=parseFloat(r['作業人數'])||'';
+  document.getElementById('ed-mh').value=parseFloat(r['總人力工時hr'])||'';
   document.getElementById('ed-cond').value=r['原料狀況']||'良好';
   document.getElementById('ed-tex').value=r['原料軟硬度']||'';
   document.getElementById('ed-note').value=r['備註']||'';
@@ -957,7 +987,7 @@ function saveEdit(){
     loc:document.getElementById('ed-loc').value,supplier:document.getElementById('ed-sup').value,
     rawkg:raw,totalOut:out,defect:def,opLoss:loss,
     yieldRate:raw>0?out/raw*100:0,defectRate:raw>0?def/raw*100:0,lossRate:raw>0?loss/raw*100:0,
-    workers:parseInt(document.getElementById('ed-wk').value)||0,grandMH:mh,efficiency:mh>0?raw/mh:0,
+    workers:parseInt(document.getElementById('ed-wk').value)||0,grandMH:mh,efficiency:mh>0?(raw/mh):0,
     condition:document.getElementById('ed-cond').value,texture:document.getElementById('ed-tex').value,
     notes:document.getElementById('ed-note').value};
   fetch(API+'?action=update&data='+encodeURIComponent(JSON.stringify(d)))
