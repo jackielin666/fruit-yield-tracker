@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>五惠 · 原料處理及分析系統</title>
+<title>五惠 原料處理記錄及分析系統</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -30,10 +30,10 @@ body{font-family:'Noto Sans TC','Inter',sans-serif;background:var(--bg);color:va
 ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
 
 /* ══ TOPBAR ══════════════════════════════ */
-.topbar{background:#2d6a4f;height:78px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 3px 16px rgba(45,106,79,.4)}
+.topbar{background:#2d6a4f;height:90px;padding:0 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 3px 16px rgba(45,106,79,.4)}
 .brand{display:flex;align-items:center;gap:12px}
 .brand-ico{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#40916c,#1b4332);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(45,106,79,.4);flex-shrink:0}
-.brand-name{font-size:19px;font-weight:700;color:#fff;letter-spacing:.3px}
+.brand-name{font-size:22px;font-weight:700;color:#fff;letter-spacing:.3px}
 .brand-sub{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:1.5px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-top:2px}
 .tnav-wrap{display:flex;gap:4px}
 .tnav{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;border:none;cursor:pointer;color:rgba(255,255,255,.6);background:transparent;font-family:inherit;transition:all .15s}
@@ -161,11 +161,11 @@ body{font-family:'Noto Sans TC','Inter',sans-serif;background:var(--bg);color:va
 .bgrp{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
 
 /* ══ TABLE ═══════════════════════════════ */
-.tw{overflow-x:auto;border-radius:var(--r2);border:1px solid var(--line)}
+.tw{overflow-x:auto;border-radius:var(--r2);border:1px solid var(--line);-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead tr{background:var(--bg2)}
-th{padding:10px 12px;text-align:left;font-weight:600;color:var(--ink3);font-size:11px;border-bottom:1px solid var(--line);white-space:nowrap;letter-spacing:.3px;text-transform:uppercase}
-td{padding:10px 12px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:middle}
+th{padding:8px 8px;text-align:left;font-weight:600;color:var(--ink3);font-size:11px;border-bottom:1px solid var(--line);white-space:nowrap;letter-spacing:.3px;text-transform:uppercase}
+td{padding:8px 8px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:middle;font-size:13px}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--bg2)}
 
@@ -246,10 +246,9 @@ tr:hover td{background:var(--bg2)}
 <!-- ══ TOPBAR ══════════════════════════════ -->
 <div class="topbar">
   <div class="brand">
-    <div class="brand-ico">🍊</div>
     <div>
-      <div class="brand-name">五惠 · 原料處理及分析系統</div>
-      <div class="brand-sub">WUHUEI · PROCESSING & ANALYTICS SYSTEM</div>
+      <div class="brand-name">五惠 原料處理記錄及分析系統</div>
+      <div class="brand-sub">WUHUEI PROCESSING & ANALYTICS SYSTEM</div>
     </div>
   </div>
   <div class="tnav-wrap">
@@ -528,8 +527,8 @@ var BUILTIN=[
   {batchId:'B018',date:'2024/08/16',fruit:'奇異果',op:'奇異果-切削',loc:'2廠3F原料',rawkg:994,totalOut:812,defect:182,opLoss:0,yieldRate:81.69,defectRate:18.31,lossRate:0,workers:16,grandMH:138,efficiency:7.203,pretreat:'',condition:'良好',texture:'偏硬',notes:'113年8/16 果肉偏硬'},
   {batchId:'B019',date:'2025/09/01',fruit:'奇異果',op:'奇異果-切削',loc:'2廠3F原料',rawkg:2243.8,totalOut:1770,defect:473.8,opLoss:0,yieldRate:78.89,defectRate:21.12,lossRate:0,workers:33,grandMH:344,efficiency:6.52,pretreat:'',condition:'良好',texture:'適中',notes:'114年9/1~9/2 果肉軟硬參雜'},
   {batchId:'B020',date:'2025/07/16',fruit:'芒果',op:'芒果-切削',loc:'2廠3F原料',rawkg:2400,totalOut:1632,defect:768,opLoss:0,yieldRate:68.0,defectRate:32.0,lossRate:0,workers:36,grandMH:221,efficiency:10.86,pretreat:'清洗',condition:'普通',texture:'偏軟',notes:'114年7/16 2400KG 108籃'},
-  {batchId:'B021',date:'2025/02/13',fruit:'菜頭',op:'蘿蔔-切削',loc:'2廠3F原料',rawkg:3900,totalOut:3575.5,defect:324.5,opLoss:0,yieldRate:91.68,defectRate:8.32,lossRate:0,workers:44,grandMH:80.7,efficiency:48.347,pretreat:'',condition:'良好',texture:'偏硬',notes:'114年2/13 3900KG 長度約25~40cm'},
-  {batchId:'B022',date:'2026/02/24',fruit:'菜頭',op:'蘿蔔-切削',loc:'2廠3F原料',rawkg:4097.4,totalOut:3765,defect:332.4,opLoss:0,yieldRate:91.89,defectRate:8.11,lossRate:0,workers:32,grandMH:100.1,efficiency:40.94,pretreat:'',condition:'良好',texture:'偏硬',notes:'115年2/24 頭尾無切削 20~45cm'}
+  {batchId:'B021',date:'2025/02/13',fruit:'蘿蔔',op:'蘿蔔-切削',loc:'2廠3F原料',rawkg:3900,totalOut:3575.5,defect:324.5,opLoss:0,yieldRate:91.68,defectRate:8.32,lossRate:0,workers:44,grandMH:80.7,efficiency:48.347,pretreat:'',condition:'良好',texture:'偏硬',notes:'114年2/13 3900KG 長度約25~40cm'},
+  {batchId:'B022',date:'2026/02/24',fruit:'蘿蔔',op:'蘿蔔-切削',loc:'2廠3F原料',rawkg:4097.4,totalOut:3765,defect:332.4,opLoss:0,yieldRate:91.89,defectRate:8.11,lossRate:0,workers:32,grandMH:100.1,efficiency:40.94,pretreat:'',condition:'良好',texture:'偏硬',notes:'115年2/24 頭尾無切削 20~45cm'}
 ];
 
 // ── FRUIT CONFIG ──────────────────────────
@@ -551,14 +550,14 @@ var FC={
     ops:[{id:'奇異果-切削',name:'奇異果切削',tag:'去頭尾削皮',pt:''}],
     outs:{'奇異果-切削':[{id:'flesh',lbl:'果肉 (KG)'}]},defHint:'果皮、爛果、頭尾切除'},
   '橘子':{ico:'<span style="font-size:36px">🍊</span>',sub:'Tangerine',isPm:false,
-    ops:[{id:'剝橘子',name:'剝橘子（取皮肉）',tag:'殺菁前置',pt:'殺菁'},{id:'橘子果肉切片去籽',name:'橘子果肉切片去籽',tag:'後段加工',pt:''},{id:'橘子榨汁',name:'橘子榨汁',tag:'製汁',pt:'榨汁裝桶/殺菁漂水'}],
-    outs:{'剝橘子':[{id:'flesh',lbl:'果肉含籽 (KG)'},{id:'skin',lbl:'橘子皮 (KG)'}],'橘子果肉切片去籽':[{id:'seedless',lbl:'去籽橘子肉 (KG)'}],'橘子榨汁':[{id:'juice',lbl:'橘子果汁 (KG)'},{id:'skin2',lbl:'橘子皮 (KG)'}]},
+    ops:[{id:'剝橘子(玻璃瓶)',name:'剝橘子（玻璃瓶）',tag:'殺菁前置',pt:'殺菁'},{id:'橘子果肉切片去籽',name:'橘子果肉切片去籽',tag:'後段加工',pt:''},{id:'橘子榨汁(NY袋)',name:'橘子榨汁（NY袋）',tag:'製汁',pt:'榨汁裝桶/殺菁漂水'}],
+    outs:{'剝橘子(玻璃瓶)':[{id:'flesh',lbl:'果肉含籽 (KG)'},{id:'skin',lbl:'橘子皮 (KG)'}],'橘子果肉切片去籽':[{id:'seedless',lbl:'去籽橘子肉 (KG)'}],'橘子榨汁(NY袋)':[{id:'juice',lbl:'橘子果汁 (KG)'},{id:'skin2',lbl:'橘子皮 (KG)'}]},
     defHint:'籽、爛果、蒂頭'},
-  '菜頭':{
+  '蘿蔔':{
     ico:'<svg width="40" height="40" viewBox="0 0 40 40"><path d="M16 15 Q11 7 13 4 Q15 8 17 13" fill="#5BA832"/><path d="M20 13 Q20 5 23 4 Q22 8 21 13" fill="#4A9828"/><path d="M24 15 Q29 7 31 9 Q28 12 22 15" fill="#5BA832"/><ellipse cx="20" cy="26" rx="10" ry="11" fill="#F5F5F5" stroke="#D0D0D0" stroke-width="1"/><ellipse cx="22" cy="23" rx="4" ry="5" fill="#fff" opacity=".5"/><path d="M20 37 Q19 40 18 42" stroke="#9DBF80" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>',
     sub:'Radish',isPm:false,
-    ops:[{id:'蘿蔔-切削',name:'菜頭切削',tag:'切削→清洗→切塊→切角→秤重',pt:''}],
-    outs:{'蘿蔔-切削':[{id:'flesh',lbl:'菜頭肉 (KG)'}]},defHint:'果皮、爛果、頭尾切除'},
+    ops:[{id:'蘿蔔-切削',name:'蘿蔔切削',tag:'切削→清洗→切塊→切角→秤重',pt:''}],
+    outs:{'蘿蔔-切削':[{id:'flesh',lbl:'蘿蔔肉 (KG)'}]},defHint:'果皮、爛果、頭尾切除'},
   '其它':{ico:'<span style="font-size:36px">🌱</span>',sub:'Other',isPm:false,
     ops:[{id:'自訂作業',name:'自訂作業',tag:'',pt:''}],
     outs:{'自訂作業':[{id:'out1',lbl:'產出品項1 (KG)'},{id:'out2',lbl:'產出品項2 (KG)'}]},
@@ -568,7 +567,7 @@ var FC={
 // 水果標籤顏色
 var FRUIT_TAG={
   '柚子':'tag-柚子','蘋果':'tag-蘋果','芒果':'tag-芒果',
-  '奇異果':'tag-奇異果','橘子':'tag-橘子','菜頭':'tag-菜頭','其它':'tag-其它'
+  '奇異果':'tag-奇異果','橘子':'tag-橘子','蘿蔔':'tag-蘿蔔','其它':'tag-其它'
 };
 
 var ALL=[],FILT=[],CUR=null,ST={fruit:null,op:null,photos:[],segN:0};
@@ -839,7 +838,7 @@ function loadRecords(){
 
 function cvtBuiltin(b){
   // 品種名稱統一：菜頭→蘿蔔（對齊dashboard）
-  var fruit=b.fruit==='菜頭'?'蘿蔔':b.fruit;
+  var fruit=b.fruit;
   return{'批次ID':b.batchId,'作業日期':b.date,'品種':fruit,'作業類型':b.op,'作業地點':b.loc||'',
     '供應商':b.supplier||'','原料重量 KG':b.rawkg,'主產出 KG':b.totalOut,'不良品 KG':b.defect,
     '作業耗損KG':b.opLoss,'步留率%':b.yieldRate,'不良品率%':b.defectRate,'耗損率%':b.lossRate,
