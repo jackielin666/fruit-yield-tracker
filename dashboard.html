@@ -355,8 +355,11 @@ function cvtSheet(r){
   var raw=parseFloat(r['原料重量 KG'])||parseFloat(r['原料重量KG'])||0;
   var out=parseFloat(r['主產出 KG'])||parseFloat(r['主產出KG'])||0;
   var def=parseFloat(r['不良品 KG'])||parseFloat(r['不良品KG'])||0;
-  var yr=parseFloat(String(r['步留率%']).replace('%',''))||0;
-  var dr=parseFloat(String(r['不良品率%']).replace('%',''))||0;
+  // 步留率：Sheets存 "67.00%" 或小數 0.67，統一轉成百分比數字
+  var yr=parseFloat(String(r['步留率%']||'').replace('%',''))||0;
+  if(yr>0&&yr<1)yr=yr*100;  // 小數格式轉換
+  var dr=parseFloat(String(r['不良品率%']||'').replace('%',''))||0;
+  if(dr>0&&dr<1)dr=dr*100;
   return{id:r['批次ID'],date:fmtDate(r['作業日期']),fruit:r['品種'],op:r['作業類型'],
     raw:raw,out:out,def:def,yr:yr,dr:dr,
     workers:parseFloat(r['作業人數'])||0,

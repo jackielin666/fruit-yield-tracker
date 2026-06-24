@@ -830,7 +830,7 @@ function cvtBuiltin(b){
   // 品種名稱統一：菜頭→蘿蔔（對齊dashboard）
   var fruit=b.fruit==='菜頭'?'蘿蔔':b.fruit;
   return{'批次ID':b.batchId,'作業日期':b.date,'品種':fruit,'作業類型':b.op,'作業地點':b.loc||'',
-    '供應商':b.supplier||'','原料重量KG':b.rawkg,'主產出KG':b.totalOut,'不良品KG':b.defect,
+    '供應商':b.supplier||'','原料重量 KG':b.rawkg,'主產出 KG':b.totalOut,'不良品 KG':b.defect,
     '作業耗損KG':b.opLoss,'步留率%':b.yieldRate,'不良品率%':b.defectRate,'耗損率%':b.lossRate,
     '作業人數':b.workers,'總人力工時hr':b.grandMH,'效率KG/人時':b.efficiency,
     '預處理':b.pretreat,'原料狀況':b.condition,'原料軟硬度':b.texture,'備註':b.notes,
@@ -860,11 +860,16 @@ function renderRecStats(){
 // 安全讀取欄位值（同時嘗試有空格/無空格的欄位名）
 function getVal(r, key){
   if(!r)return null;
+  // 直接讀取
   var v=r[key];
   if(v!==undefined&&v!==null&&v!=='')return v;
-  // 嘗試帶空格版本（Sheets有時欄位名有空格）
-  var k2=key.replace('KG',' KG').replace('hr',' hr');
+  // 嘗試有空格版本
+  var k2=key.replace(/KG/g,' KG').replace(/hr/g,' hr').replace(/  /g,' ').trim();
   v=r[k2];
+  if(v!==undefined&&v!==null&&v!=='')return v;
+  // 嘗試無空格版本
+  var k3=key.replace(/ /g,'');
+  v=r[k3];
   if(v!==undefined&&v!==null&&v!=='')return v;
   return null;
 }
@@ -886,7 +891,7 @@ function renderRecs(){
     var y=pctVal(r['步留率%']);
     var dr=pctVal(r['不良品率%']);
     var yC=y>=70?'bg':y>=50?'by':'br';
-    var raw=parseFloat(r['原料重量KG'])||0;
+    var raw=parseFloat(r['原料重量 KG'])||0;
     var isB=r['_builtin'];
     return'<tr>'+
       '<td style="color:var(--ink4);font-size:13px;font-family:JetBrains Mono,monospace;white-space:nowrap">'+(i+1)+'</td>'+
@@ -921,14 +926,14 @@ function showDet(i){
     '<div class="ir"><span>供應商</span><span class="iv">'+(r['供應商']||'-')+'</span></div>'+
     '<div class="ir"><span>原料狀況</span><span class="iv">'+(r['原料狀況']||'-')+'</span></div>'+
     '<div class="ir"><span>軟硬度</span><span class="iv">'+(r['原料軟硬度']||'-')+'</span></div>'+
-    '<div class="ir"><span>投入重量</span><span class="iv">'+getNum(r,'原料重量KG').toLocaleString()+' KG</span></div></div>'+
+    '<div class="ir"><span>投入重量</span><span class="iv">'+getNum(r,'原料重量 KG').toLocaleString()+' KG</span></div></div>'+
     '<div><div style="font-size:11px;color:var(--ink4);font-weight:600;letter-spacing:.5px;margin-bottom:7px">三層分析</div>'+
     '<div style="background:linear-gradient(145deg,#0f172a,#1e3a5f);border-radius:var(--r2);padding:14px;color:#fff;border:1px solid #1e3a8a">'+
     '<div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12px;color:rgba(255,255,255,.5)">步留率</span><span style="font-size:22px;font-weight:700;font-family:JetBrains Mono,monospace;color:'+(y>=70?'#34d399':y>=50?'#fbbf24':'#f87171')+'">'+y.toFixed(1)+'%</span></div>'+
     '<div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12px;color:rgba(255,255,255,.5)">不良品率</span><span style="font-size:17px;font-weight:600;color:#f87171">'+pctVal(r['不良品率%']).toFixed(1)+'%</span></div>'+
     '<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:rgba(255,255,255,.5)">作業耗損率</span><span style="font-size:17px;font-weight:600;color:#fbbf24">'+pctVal(r['耗損率%']).toFixed(1)+'%</span></div></div>'+
-    '<div class="ir" style="margin-top:8px"><span>產出合計</span><span class="iv">'+getNum(r,'主產出KG').toLocaleString()+' KG</span></div>'+
-    '<div class="ir"><span>不良品</span><span class="iv">'+getNum(r,'不良品KG')+' KG</span></div></div></div>'+
+    '<div class="ir" style="margin-top:8px"><span>產出合計</span><span class="iv">'+getNum(r,'主產出 KG').toLocaleString()+' KG</span></div>'+
+    '<div class="ir"><span>不良品</span><span class="iv">'+getNum(r,'不良品 KG')+' KG</span></div></div></div>'+
     '<div class="divider"></div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
     '<div><div style="font-size:11px;color:var(--ink4);font-weight:600;letter-spacing:.5px;margin-bottom:7px">人力工時</div>'+
@@ -957,9 +962,9 @@ function openEdit(){
   document.getElementById('ed-date').value=toInputDate(r['作業日期']);
   document.getElementById('ed-loc').value=r['作業地點']||'';
   document.getElementById('ed-sup').value=r['供應商']||'';
-  document.getElementById('ed-raw').value=parseFloat(r['原料重量KG'])||'';
-  document.getElementById('ed-out').value=parseFloat(r['主產出KG'])||'';
-  document.getElementById('ed-def').value=parseFloat(r['不良品KG'])||'';
+  document.getElementById('ed-raw').value=parseFloat(r['原料重量 KG'])||'';
+  document.getElementById('ed-out').value=parseFloat(r['主產出 KG'])||'';
+  document.getElementById('ed-def').value=parseFloat(r['不良品 KG'])||'';
   document.getElementById('ed-wk').value=parseFloat(r['作業人數'])||'';
   document.getElementById('ed-mh').value=parseFloat(r['總人力工時hr'])||'';
   document.getElementById('ed-cond').value=r['原料狀況']||'良好';
@@ -1005,7 +1010,7 @@ function confirmDel(){closeM('det');if(!CUR)return;showDelM();}
 function confirmDelD(i){CUR=FILT[i];showDelM();}
 function showDelM(){
   var r=CUR;
-  document.getElementById('del-info').innerHTML='<b>'+r['品種']+'</b> — '+r['作業類型']+' ('+r['作業日期']+')　投入 '+r['原料重量KG']+' KG';
+  document.getElementById('del-info').innerHTML='<b>'+r['品種']+'</b> — '+r['作業類型']+' ('+r['作業日期']+')　投入 '+r['原料重量 KG']+' KG';
   document.getElementById('modal-del').classList.remove('hidden');
 }
 function doDelete(){
@@ -1020,7 +1025,7 @@ function doDelete(){
 // ── EXPORT ───────────────────────────────
 function doExport(){
   if(!ALL.length){toast('無資料可匯出','info');return;}
-  var headers=['批次ID','作業日期','品種','作業類型','作業地點','供應商','原料重量KG','主產出KG','不良品KG','作業耗損KG','步留率%','不良品率%','耗損率%','作業人數','總人力工時hr','效率KG/人時','預處理','原料狀況','原料軟硬度','備註'];
+  var headers=['批次ID','作業日期','品種','作業類型','作業地點','供應商','原料重量 KG','主產出 KG','不良品 KG','作業耗損KG','步留率%','不良品率%','耗損率%','作業人數','總人力工時hr','效率KG/人時','預處理','原料狀況','原料軟硬度','備註'];
   var rows=[headers.join(',')];
   ALL.forEach(function(r){
     rows.push(headers.map(function(h){
