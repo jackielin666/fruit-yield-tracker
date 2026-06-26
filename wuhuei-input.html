@@ -648,8 +648,9 @@ function selFruit(f){
   document.getElementById('fc-'+f).classList.add('sel');
   document.getElementById('op-sec').classList.remove('hidden');
   var cfg=FC[f],html='';
-  cfg.ops.forEach(function(op,i){
-    html+='<div class="ocard" data-opid="'+op.id+'" id="oc-'+i+'" onclick="selOp(this.dataset.opid)">'+
+  cfg.ops.forEach(function(op){
+    var opIdEsc=op.id.replace(/'/g,"\\'");
+    html+='<div class="ocard" data-opid="'+op.id+'" onclick="selOp(\''+opIdEsc+'\')">' +
       '<div class="ocard-name">'+op.name+'</div>'+
       (op.tag?'<div class="ocard-tag">🔧 '+op.tag+'</div>':'')+
       '</div>';
@@ -661,7 +662,7 @@ function selFruit(f){
 function selOp(id){
   ST.op=id;
   document.querySelectorAll('.ocard').forEach(function(e){e.classList.remove('sel')});
-  var oe=document.querySelector('.ocard[data-opid="'+id+'"]');if(oe)oe.classList.add('sel');
+  document.querySelectorAll('.ocard').forEach(function(e){if(e.dataset.opid===id)e.classList.add('sel');});
   var cfg=FC[ST.fruit],opCfg=cfg.ops.find(function(o){return o.id===id;});
   if(opCfg&&opCfg.pt){document.getElementById('i-pt').value=opCfg.pt;document.getElementById('pt-badge').textContent='已自動帶入：'+opCfg.pt;}
   else{document.getElementById('i-pt').value='';document.getElementById('pt-badge').textContent='無預處理';}
