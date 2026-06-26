@@ -709,13 +709,13 @@ function readPhoto(f){
         ctx.save();
         // 旋轉矩陣：依EXIF方向調整座標系
         switch(orient){
-          case 2:ctx.transform(-1,0,0,1,sw,0);break;
-          case 3:ctx.transform(-1,0,0,-1,sw,sh);break;
-          case 4:ctx.transform(1,0,0,-1,0,sh);break;
-          case 5:ctx.transform(0,1,1,0,0,0);break;
-          case 6:ctx.rotate(Math.PI/2);ctx.drawImage(img,0,-sh,sw,sh);break;
-          case 7:{ctx.rotate(Math.PI/2);ctx.scale(-1,1);ctx.drawImage(img,-sw,-sh,sw,sh);break;}
-          case 8:ctx.rotate(-Math.PI/2);ctx.drawImage(img,-sw,0,sw,sh);break;
+          case 2:ctx.transform(-1,0,0,1,sw,0);ctx.drawImage(img,0,0,sw,sh);break;
+          case 3:ctx.transform(-1,0,0,-1,sw,sh);ctx.drawImage(img,0,0,sw,sh);break;
+          case 4:ctx.transform(1,0,0,-1,0,sh);ctx.drawImage(img,0,0,sw,sh);break;
+          case 5:ctx.transform(0,1,1,0,0,0);ctx.drawImage(img,0,0,sw,sh);break;
+          case 6:ctx.translate(sh,0);ctx.rotate(Math.PI/2);ctx.drawImage(img,0,0,sw,sh);break;
+          case 7:ctx.transform(0,-1,-1,0,sh,sw);ctx.drawImage(img,0,0,sw,sh);break;
+          case 8:ctx.translate(0,sw);ctx.rotate(-Math.PI/2);ctx.drawImage(img,0,0,sw,sh);break;
           default:ctx.drawImage(img,0,0,sw,sh);
         }
         ctx.restore();
@@ -1182,13 +1182,13 @@ function readPhotoForEdit(f){
         else{canvas.width=sw;canvas.height=sh;}
         ctx.save();
         switch(orient){
-          case 2:ctx.transform(-1,0,0,1,sw,0);break;
-          case 3:ctx.transform(-1,0,0,-1,sw,sh);break;
-          case 4:ctx.transform(1,0,0,-1,0,sh);break;
-          case 5:ctx.transform(0,1,1,0,0,0);break;
-          case 6:ctx.rotate(Math.PI/2);ctx.drawImage(img,0,-sh,sw,sh);break;
-          case 7:{ctx.rotate(Math.PI/2);ctx.scale(-1,1);ctx.drawImage(img,-sw,-sh,sw,sh);break;}
-          case 8:ctx.rotate(-Math.PI/2);ctx.drawImage(img,-sw,0,sw,sh);break;
+          case 2:ctx.transform(-1,0,0,1,sw,0);ctx.drawImage(img,0,0,sw,sh);break;
+          case 3:ctx.transform(-1,0,0,-1,sw,sh);ctx.drawImage(img,0,0,sw,sh);break;
+          case 4:ctx.transform(1,0,0,-1,0,sh);ctx.drawImage(img,0,0,sw,sh);break;
+          case 5:ctx.transform(0,1,1,0,0,0);ctx.drawImage(img,0,0,sw,sh);break;
+          case 6:ctx.translate(sh,0);ctx.rotate(Math.PI/2);ctx.drawImage(img,0,0,sw,sh);break;
+          case 7:ctx.transform(0,-1,-1,0,sh,sw);ctx.drawImage(img,0,0,sw,sh);break;
+          case 8:ctx.translate(0,sw);ctx.rotate(-Math.PI/2);ctx.drawImage(img,0,0,sw,sh);break;
           default:ctx.drawImage(img,0,0,sw,sh);
         }
         ctx.restore();
