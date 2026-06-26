@@ -884,7 +884,7 @@ function doSync(batch){
 function uploadPhotos(batchId, photos){
   if(!photos||photos.length===0)return;
   toast('📷 照片上傳中(1/'+photos.length+')...','info');
-  // 逐張依序上傳，GET方式每次傳1張
+  // 逐張依序POST上傳（base64太大不能用GET）
   function uploadOne(idx){
     if(idx>=photos.length){
       toast('📷 共'+photos.length+'張照片已存入 Google Drive！','ok');
@@ -892,15 +892,20 @@ function uploadPhotos(batchId, photos){
     }
     var p=photos[idx];
     var base64=p.dataUrl?p.dataUrl.split(',')[1]:'';
-    var payload={batchId:batchId,photoIndex:idx,total:photos.length,
-                 data:base64,type:p.type||'image/jpeg'};
-    fetch(API+'?action=uploadPhoto&data='+encodeURIComponent(JSON.stringify(payload)),{method:'GET'})
+    var payload={action:'uploadPhoto',batchId:batchId,photoIndex:idx,
+                 total:photos.length,data:base64,type:p.type||'image/jpeg'};
+    fetch(API,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(payload)
+    })
     .then(function(r){return r.json();})
     .then(function(res){
       if(idx+1<photos.length)toast('📷 照片上傳中('+(idx+2)+'/'+photos.length+')...','info');
       uploadOne(idx+1);
     })
     .catch(function(err){
+      console.error('photo upload err',err);
       toast('⚠️ 第'+(idx+1)+'張上傳失敗，繼續下一張','info');
       uploadOne(idx+1);
     });
