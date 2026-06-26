@@ -519,7 +519,21 @@ tr:hover td{background:var(--bg2)}
     <button class="btn btn-p btn-sm" onclick="showView('input');resetAll()">➕ 新增記錄</button>
   </div>
 </div>
-<div id="toasts"></div>
+<!-- ══ PHOTO MODAL ════════════════════════ -->
+  <div class="mov hidden" id="modal-photo">
+    <div class="mbox" style="max-width:600px">
+      <div class="mhd">
+        <h3 id="photo-title">📷 批次照片</h3>
+        <button onclick="closeM('photo')" style="background:none;border:none;cursor:pointer;font-size:17px;color:var(--ink3)">✕</button>
+      </div>
+      <div id="photo-content" style="padding:20px;text-align:center"></div>
+      <div style="padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end">
+        <a id="photo-folder-link" href="#" target="_blank" class="btn btn-p btn-sm">📁 在 Google Drive 開啟資料夾</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
 
 <script>
 var API='https://script.google.com/macros/s/AKfycbzp8GhrGvXay8HiQFBHDzmz6zZY1X5YYlr0TB_XBW6B-iueOyOHAUNJSSvF6qTUZAAdqA/exec';
@@ -866,9 +880,15 @@ function doSync(batch){
       setSS('ok','✅ 已同步');
       toast('✅ 已成功寫入 Google Sheets！','ok');
       showSuccess(batch);
-      // 若有照片，非同步上傳到 Drive
-      if(ST.photos&&ST.photos.length>0){
-        uploadPhotos(res.batchId||batch.id, ST.photos);
+      // 若有照片，延遲2秒再上傳（確保 Apps Script 寫入完成）
+      var _bid=res.batchId||batch.id;
+      var _photos=ST.photos.slice(); // 立即複製，避免resetAll清空
+      console.log('[Photo] batchId='+_bid+' photos='+_photos.length);
+      if(_photos.length>0){
+        setTimeout(function(){
+          console.log('[Photo] 開始上傳 '+_photos.length+' 張');
+          uploadPhotos(_bid,_photos);
+        },2000);
       }
     }
     else throw new Error(res.message||'錯誤');
@@ -911,6 +931,21 @@ function uploadPhotos(batchId, photos){
     });
   }
   uploadOne(0);
+}
+
+function showPhotos(i){
+  var r=FILT[i];
+  if(!r)return;
+  var batchId=r['批次ID']||r['batchId'];
+  var folderUrl=r['照片連結']||'';
+  document.getElementById('photo-title').textContent='📷 '+batchId+' 照片';
+  document.getElementById('photo-folder-link').href=folderUrl;
+  var content=document.getElementById('photo-content');
+  content.innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:40px">📁</div>'+
+    '<div style="margin:12px 0;color:var(--ink2)">照片存放於 Google Drive 批次資料夾</div>'+
+    '<a href="'+folderUrl+'" target="_blank" class="btn btn-p" style="margin-top:8px">'+
+    '🔗 點此開啟 '+batchId+' 照片資料夾</a></div>';
+  document.getElementById('modal-photo').classList.remove('hidden');
 }
 
 function toggleLock(i){
@@ -1069,6 +1104,7 @@ function renderRecs(){
       '<td style="font-family:JetBrains Mono,monospace;font-size:13px;text-align:right">'+(parseFloat(r['效率KG/人時'])||0).toFixed(2)+'</td>'+
       '<td><div class="bgrp" style="flex-wrap:nowrap">'+
         '<button class="btn btn-i btn-sm" onclick="showDet('+i+')" style="white-space:nowrap">詳情</button>'+
+        (r['照片連結']?'<button class="btn btn-sm" onclick="showPhotos('+i+')" title="查看照片" style="background:#e0f2fe;border-color:#7dd3fc;color:#0369a1">📷</button>':'')+
         (!isB?'<button class="btn btn-lock btn-sm'+(isLocked?' locked':'')+' " onclick="toggleLock('+i+')" title="'+(isLocked?'解除鎖定':'鎖定此筆資料')+'">'+(isLocked?'🔒':'🔓')+'</button>':'')+
         (!isB&&!isLocked?'<button class="btn btn-w btn-sm" onclick="openEditD('+i+')" title="修改此筆記錄">✏️</button>':'')+
         (!isB&&!isLocked?'<button class="btn btn-r btn-sm" onclick="confirmDelD('+i+')" title="刪除此筆記錄">🗑️</button>':'')+
