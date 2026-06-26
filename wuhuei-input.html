@@ -311,11 +311,16 @@ tr:hover td{background:var(--bg2)}
           <div class="fg full"><label class="flbl">備註</label><textarea class="ft" id="i-note" placeholder="原料來源、特殊狀況、品種規格等..."></textarea></div>
           <div class="fg full">
             <label class="flbl">📷 現場照片</label>
-            <div class="photo-zone" onclick="document.getElementById('i-photo').click()" id="pzone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="photoDrop(event)">
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <button class="btn btn-sm" style="flex:1" onclick="document.getElementById('i-photo-cam').click()">📷 拍照</button>
+              <button class="btn btn-sm" style="flex:1" onclick="document.getElementById('i-photo-lib').click()">🖼️ 相簿選取</button>
+            </div>
+            <div class="photo-zone" onclick="document.getElementById('i-photo-lib').click()" id="pzone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="photoDrop(event)">
               <div style="font-size:26px;margin-bottom:5px">📷</div>
               <p style="font-size:13px;color:var(--ink4)">點擊上傳或拖曳照片（可多張）</p>
             </div>
-            <input type="file" id="i-photo" accept="image/*" multiple style="display:none" onchange="handlePhotos(event)">
+            <input type="file" id="i-photo-cam" accept="image/*" capture="environment" style="display:none" onchange="handlePhotos(event)">
+            <input type="file" id="i-photo-lib" accept="image/*" multiple style="display:none" onchange="handlePhotos(event)">
             <div class="photo-prev" id="photo-prev"></div>
           </div>
         </div>
@@ -468,6 +473,17 @@ tr:hover td{background:var(--bg2)}
         <div class="fg"><label class="flbl">原料狀況</label><select class="fs" id="ed-cond"><option>良好</option><option>普通</option><option>較差</option></select></div>
         <div class="fg"><label class="flbl">軟硬度</label><select class="fs" id="ed-tex"><option value="">--</option><option>偏硬</option><option>適中</option><option>偏軟</option></select></div>
         <div class="fg" style="grid-column:1/-1"><label class="flbl">備註</label><textarea class="ft" id="ed-note" style="min-height:56px"></textarea></div>
+        <div class="fg" style="grid-column:1/-1">
+          <label class="flbl">📷 補拍照片</label>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <button type="button" class="btn btn-sm" style="flex:1" onclick="document.getElementById('ed-photo-cam').click()">📷 拍照</button>
+            <button type="button" class="btn btn-sm" style="flex:1" onclick="document.getElementById('ed-photo-lib').click()">🖼️ 相簿選取</button>
+          </div>
+          <input type="file" id="ed-photo-cam" accept="image/*" capture="environment" style="display:none" onchange="handleEditPhotos(event)">
+          <input type="file" id="ed-photo-lib" accept="image/*" multiple style="display:none" onchange="handleEditPhotos(event)">
+          <div id="ed-photo-prev" style="display:flex;flex-wrap:wrap;gap:7px;margin-top:6px"></div>
+          <div id="ed-photo-count" style="font-size:11px;color:var(--ink4);margin-top:4px"></div>
+        </div>
       </div>
       <div id="ed-live" class="hidden" style="margin-top:12px;padding:10px 13px;background:var(--blue-l);border:1px solid var(--blue-b);border-radius:var(--r);font-size:13px;color:var(--blue-m)"></div>
     </div>
@@ -654,8 +670,73 @@ function selOp(id){
 // ── PHOTOS ────────────────────────────────
 function photoDrop(e){e.preventDefault();document.getElementById('pzone').classList.remove('drag');Array.from(e.dataTransfer.files).forEach(readPhoto);}
 function handlePhotos(e){Array.from(e.target.files).forEach(readPhoto);e.target.value='';}
-function readPhoto(f){var r=new FileReader();r.onload=function(ev){ST.photos.push(ev.target.result);renderPhotos();};r.readAsDataURL(f);}
-function renderPhotos(){document.getElementById('photo-prev').innerHTML=ST.photos.map(function(s,i){return'<div class="thumb"><img src="'+s+'"><button class="pdel" onclick="removePhoto('+i+')">✕</button></div>';}).join('');}
+function readPhoto(f){
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var img=new Image();
+    img.onload=function(){
+      // EXIF 旋轉修正
+      getExifOrientation(f,function(orient){
+        var canvas=document.createElement('canvas');
+        var ctx=canvas.getContext('2d');
+        var w=img.width,h=img.height;
+        if(orient>=5&&orient<=8){canvas.width=h;canvas.height=w;}
+        else{canvas.width=w;canvas.height=h;}
+        ctx.save();
+        switch(orient){
+          case 2:ctx.transform(-1,0,0,1,w,0);break;
+          case 3:ctx.transform(-1,0,0,-1,w,h);break;
+          case 4:ctx.transform(1,0,0,-1,0,h);break;
+          case 5:ctx.transform(0,1,1,0,0,0);break;
+          case 6:ctx.transform(0,1,-1,0,h,0);break;
+          case 7:ctx.transform(0,-1,-1,0,h,w);break;
+          case 8:ctx.transform(0,-1,1,0,0,w);break;
+        }
+        ctx.drawImage(img,0,0);
+        ctx.restore();
+        var dataUrl=canvas.toDataURL('image/jpeg',0.85);
+        ST.photos.push({dataUrl:dataUrl,type:f.type||'image/jpeg',name:f.name});
+        renderPhotos();
+      });
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+function getExifOrientation(file,callback){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var view=new DataView(e.target.result);
+    if(view.getUint16(0,false)!==0xFFD8){callback(1);return;}
+    var length=view.byteLength,offset=2;
+    while(offset<length){
+      if(view.getUint16(offset+2,false)<=8){callback(1);return;}
+      var marker=view.getUint16(offset,false);
+      offset+=2;
+      if(marker===0xFFE1){
+        if(view.getUint32(offset+=2,false)!==0x45786966){callback(1);return;}
+        var little=view.getUint16(offset+=6,false)===0x4949;
+        offset+=view.getUint32(offset+4,little);
+        var tags=view.getUint16(offset,little);
+        offset+=2;
+        for(var i=0;i<tags;i++){
+          if(view.getUint16(offset+(i*12),little)===0x0112){
+            callback(view.getUint16(offset+(i*12)+8,little));return;
+          }
+        }
+      } else if((marker&0xFF00)!==0xFF00){break;}
+      else{offset+=view.getUint16(offset,false);}
+    }
+    callback(1);
+  };
+  reader.readAsArrayBuffer(file);
+}
+function renderPhotos(){
+  document.getElementById('photo-prev').innerHTML=ST.photos.map(function(p,i){
+    var src=p.dataUrl||p;
+    return'<div class="thumb"><img src="'+src+'"><button class="pdel" onclick="removePhoto('+i+')" title="移除照片">✕</button></div>';
+  }).join('');
+}
 function removePhoto(i){ST.photos.splice(i,1);renderPhotos();}
 
 // ── LABOR ────────────────────────────────
@@ -772,7 +853,15 @@ function doSync(batch){
   fetch(API+'?action=write&data='+encoded,{method:'GET'})
   .then(function(r){return r.json();})
   .then(function(res){
-    if(res.status==='ok'){setSS('ok','✅ 已同步');toast('✅ 已成功寫入 Google Sheets！','ok');showSuccess(batch);}
+    if(res.status==='ok'){
+      setSS('ok','✅ 已同步');
+      toast('✅ 已成功寫入 Google Sheets！','ok');
+      showSuccess(batch);
+      // 若有照片，非同步上傳到 Drive
+      if(ST.photos&&ST.photos.length>0){
+        uploadPhotos(res.batchId||batch.id, ST.photos);
+      }
+    }
     else throw new Error(res.message||'錯誤');
   })
   .catch(function(err){setSS('err','同步失敗');toast('❌ 同步失敗：'+err.message,'err');})
@@ -781,6 +870,22 @@ function doSync(batch){
     btn.disabled=false;
     btn.textContent='✅ 儲存並同步到 Google Sheets';
   });
+}
+
+function uploadPhotos(batchId, photos){
+  if(!photos||photos.length===0)return;
+  toast('📷 照片上傳中...','info');
+  var photoData=photos.map(function(p){
+    var base64=p.dataUrl?p.dataUrl.split(',')[1]:'';
+    return{data:base64,type:p.type||'image/jpeg'};
+  });
+  var payload={batchId:batchId,photos:photoData};
+  fetch(API+'?action=uploadPhotos&data='+encodeURIComponent(JSON.stringify(payload)),{method:'GET'})
+  .then(function(r){return r.json();})
+  .then(function(res){
+    if(res.status==='ok')toast('📷 照片已存入 Google Drive！','ok');
+  })
+  .catch(function(){toast('⚠️ 照片上傳失敗，資料已儲存','info');});
 }
 
 function showSuccess(b){
@@ -970,7 +1075,57 @@ function toInputDate(d){
   if(s.indexOf('T')>-1)s=s.slice(0,10);
   return s.replace(/\//g,'-');
 }
+var EDIT_PHOTOS=[];
+function handleEditPhotos(e){
+  Array.from(e.target.files).forEach(function(f){
+    readPhotoForEdit(f);
+  });
+  e.target.value='';
+}
+function readPhotoForEdit(f){
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var img=new Image();
+    img.onload=function(){
+      getExifOrientation(f,function(orient){
+        var canvas=document.createElement('canvas');
+        var ctx=canvas.getContext('2d');
+        var w=img.width,h=img.height;
+        if(orient>=5&&orient<=8){canvas.width=h;canvas.height=w;}
+        else{canvas.width=w;canvas.height=h;}
+        ctx.save();
+        switch(orient){
+          case 2:ctx.transform(-1,0,0,1,w,0);break;
+          case 3:ctx.transform(-1,0,0,-1,w,h);break;
+          case 4:ctx.transform(1,0,0,-1,0,h);break;
+          case 5:ctx.transform(0,1,1,0,0,0);break;
+          case 6:ctx.transform(0,1,-1,0,h,0);break;
+          case 7:ctx.transform(0,-1,-1,0,h,w);break;
+          case 8:ctx.transform(0,-1,1,0,0,w);break;
+        }
+        ctx.drawImage(img,0,0);
+        ctx.restore();
+        var dataUrl=canvas.toDataURL('image/jpeg',0.85);
+        EDIT_PHOTOS.push({dataUrl:dataUrl,type:f.type||'image/jpeg'});
+        renderEditPhotos();
+      });
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+function renderEditPhotos(){
+  var prev=document.getElementById('ed-photo-prev');
+  var count=document.getElementById('ed-photo-count');
+  if(!prev)return;
+  prev.innerHTML=EDIT_PHOTOS.map(function(p,i){
+    return'<div class="thumb"><img src="'+p.dataUrl+'" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--line)">'+
+    '<button onclick="EDIT_PHOTOS.splice('+i+',1);renderEditPhotos()" style="position:absolute;top:-5px;right:-5px;width:17px;height:17px;background:var(--red-m);color:#fff;border:none;border-radius:50%;font-size:9px;cursor:pointer">✕</button></div>';
+  }).join('');
+  if(count)count.textContent=EDIT_PHOTOS.length>0?'已選 '+EDIT_PHOTOS.length+' 張照片':'';
+}
 function openEdit(){
+  EDIT_PHOTOS=[];renderEditPhotos();
   closeM('det');if(!CUR)return;var r=CUR;
   document.getElementById('ed-date').value=toInputDate(r['作業日期']);
   document.getElementById('ed-loc').value=r['作業地點']||'';
@@ -1013,7 +1168,18 @@ function saveEdit(){
     notes:document.getElementById('ed-note').value};
   fetch(API+'?action=update&data='+encodeURIComponent(JSON.stringify(d)))
   .then(function(r){return r.json();})
-  .then(function(res){if(res.status==='ok'){toast('✅ 修改已儲存','ok');closeM('edit');loadRecords();}else throw new Error(res.message);})
+  .then(function(res){
+    if(res.status==='ok'){
+      toast('✅ 修改已儲存','ok');
+      closeM('edit');
+      loadRecords();
+      // 若有補拍照片，上傳到 Drive（追加）
+      if(EDIT_PHOTOS&&EDIT_PHOTOS.length>0){
+        uploadPhotos(d.batchId, EDIT_PHOTOS);
+        EDIT_PHOTOS=[];
+      }
+    }else throw new Error(res.message);
+  })
   .catch(function(err){toast('❌ 修改失敗：'+err.message,'err');})
   .finally(function(){btn.disabled=false;btn.textContent='💾 儲存修改';});
 }
