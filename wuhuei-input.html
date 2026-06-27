@@ -932,8 +932,7 @@ function showPhotos(i){
     pc.innerHTML=ids.map(function(id,idx){
       var thumb='https://drive.google.com/thumbnail?id='+id.trim()+'&sz=w400';
       return '<img src="'+thumb+'" onclick="openPhotoZoom('+idx+')" '+
-        'style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:zoom-in;background:#f0f0f0" '+
-        'onerror="this.style.background='#eee';this.alt='載入失敗'">';
+        'style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:zoom-in;background:#f0f0f0">';
     }).join('');
   }
   document.getElementById('modal-photo').classList.remove('hidden');
