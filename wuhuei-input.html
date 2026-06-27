@@ -520,17 +520,22 @@ tr:hover td{background:var(--bg2)}
   </div>
 </div>
 <!-- ══ PHOTO MODAL ════════════════════════ -->
-  <div class="mov hidden" id="modal-photo">
-    <div class="mbox" style="max-width:600px">
-      <div class="mhd">
+  <div class="mov hidden" id="modal-photo" onclick="if(event.target===this)closeM('photo')">
+    <div class="mbox" style="max-width:700px;max-height:90vh;display:flex;flex-direction:column">
+      <div class="mhd" style="flex-shrink:0">
         <h3 id="photo-title">📷 批次照片</h3>
-        <button onclick="closeM('photo')" style="background:none;border:none;cursor:pointer;font-size:17px;color:var(--ink3)">✕</button>
+        <button onclick="closeM('photo')" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--ink3)">✕</button>
       </div>
-      <div id="photo-content" style="padding:20px;text-align:center"></div>
-      <div style="padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end">
-        <a id="photo-folder-link" href="#" target="_blank" class="btn btn-p btn-sm">📁 在 Google Drive 開啟資料夾</a>
-      </div>
+      <div id="photo-content" style="padding:16px;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"></div>
     </div>
+  </div>
+  <!-- 全螢幕放大 -->
+  <div id="photo-zoom" onclick="closePhotoZoom()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:999;align-items:center;justify-content:center;flex-direction:column">
+    <button onclick="closePhotoZoom()" style="position:absolute;top:16px;right:20px;background:none;border:none;color:#fff;font-size:32px;cursor:pointer">✕</button>
+    <button id="zoom-prev" onclick="event.stopPropagation();zoomNav(-1)" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.2);border:none;color:#fff;font-size:32px;width:48px;height:48px;border-radius:50%;cursor:pointer">‹</button>
+    <img id="zoom-img" src="" style="max-width:95vw;max-height:88vh;object-fit:contain;border-radius:8px">
+    <div id="zoom-counter" style="color:rgba(255,255,255,.6);font-size:13px;margin-top:10px"></div>
+    <button id="zoom-next" onclick="event.stopPropagation();zoomNav(1)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.2);border:none;color:#fff;font-size:32px;width:48px;height:48px;border-radius:50%;cursor:pointer">›</button>
   </div>
 
   <div id="toasts"></div>
@@ -694,35 +699,17 @@ function readPhoto(f){
   reader.onload=function(ev){
     var img=new Image();
     img.onload=function(){
-      // EXIF 旋轉修正
-      getExifOrientation(f,function(orient){
-        var canvas=document.createElement('canvas');
-        var ctx=canvas.getContext('2d');
-        var w=img.width,h=img.height;
-        // 長邊縮小至800px，確保GET URL不超限
-        var MAX=1024;
-        if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
-        var sw=w,sh=h;
-        // EXIF旋轉：orient 5-8 寬高互換（直式保持直式）
-        if(orient>=5&&orient<=8){canvas.width=sh;canvas.height=sw;}
-        else{canvas.width=sw;canvas.height=sh;}
-        ctx.save();
-        // 旋轉矩陣：依EXIF方向調整座標系
-        switch(orient){
-          case 2:ctx.transform(-1,0,0,1,sw,0);ctx.drawImage(img,0,0,sw,sh);break;
-          case 3:ctx.transform(-1,0,0,-1,sw,sh);ctx.drawImage(img,0,0,sw,sh);break;
-          case 4:ctx.transform(1,0,0,-1,0,sh);ctx.drawImage(img,0,0,sw,sh);break;
-          case 5:ctx.transform(0,1,1,0,0,0);ctx.drawImage(img,0,0,sw,sh);break;
-          case 6:ctx.translate(sh,0);ctx.rotate(Math.PI/2);ctx.drawImage(img,0,0,sw,sh);break;
-          case 7:ctx.transform(0,-1,-1,0,sh,sw);ctx.drawImage(img,0,0,sw,sh);break;
-          case 8:ctx.translate(0,sw);ctx.rotate(-Math.PI/2);ctx.drawImage(img,0,0,sw,sh);break;
-          default:ctx.drawImage(img,0,0,sw,sh);
-        }
-        ctx.restore();
-        var dataUrl=canvas.toDataURL('image/jpeg',0.6);
-        ST.photos.push({dataUrl:dataUrl,type:f.type||'image/jpeg',name:f.name});
-        renderPhotos();
-      });
+      // 不做旋轉，直接壓縮（Drive顯示時自動讀EXIF方向）
+      var canvas=document.createElement('canvas');
+      var ctx=canvas.getContext('2d');
+      var w=img.width,h=img.height;
+      var MAX=1024;
+      if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+      canvas.width=w; canvas.height=h;
+      ctx.drawImage(img,0,0,w,h);
+      var dataUrl=canvas.toDataURL('image/jpeg',0.6);
+      ST.photos.push({dataUrl:dataUrl,type:f.type||'image/jpeg',name:f.name});
+      renderPhotos();
     };
     img.src=ev.target.result;
   };
@@ -927,23 +914,55 @@ function uploadPhotos(batchId, photos){
   uploadOne(0);
 }
 
+var _zoomIds=[], _zoomIdx=0;
+
 function showPhotos(i){
   var r=FILT[i];
   if(!r)return;
   var batchId=r['批次ID']||r['batchId'];
-  var folderId=r['照片連結']||'';
-  var folderUrl='https://drive.google.com/drive/folders/'+folderId;
-  document.getElementById('photo-title').textContent='📷 '+batchId+' 照片';
-  document.getElementById('photo-folder-link').href=folderUrl;
+  var ids=String(r['照片連結']||'').split(',').filter(function(x){return x.trim();});
+  document.getElementById('photo-title').textContent='📷 '+batchId+'（'+ids.length+'張）';
   var pc=document.getElementById('photo-content');
-  // 用 Drive thumbnail API 顯示縮圖（學外倉系統）
-  // 資料夾ID存在照片連結欄，縮圖只能透過開啟Drive資料夾查看
-  pc.innerHTML='<div style="text-align:center;padding:16px">'+
-    '<div style="font-size:48px;margin-bottom:12px">📁</div>'+
-    '<div style="color:var(--ink2);margin-bottom:16px;font-size:14px">'+batchId+' 的照片存放於 Google Drive</div>'+
-    '<a href="'+folderUrl+'" target="_blank" class="btn btn-p">🔗 開啟照片資料夾</a>'+
-    '</div>';
+  if(ids.length===0){
+    pc.style.display='block';
+    pc.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3)">此批次尚無照片</div>';
+  } else {
+    pc.style.display='grid';
+    _zoomIds=ids;
+    pc.innerHTML=ids.map(function(id,idx){
+      var thumb='https://drive.google.com/thumbnail?id='+id.trim()+'&sz=w400';
+      return '<img src="'+thumb+'" onclick="openPhotoZoom('+idx+')" '+
+        'style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:zoom-in;background:#f0f0f0" '+
+        'onerror="this.style.background='#eee';this.alt='載入失敗'">';
+    }).join('');
+  }
   document.getElementById('modal-photo').classList.remove('hidden');
+}
+
+function openPhotoZoom(idx){
+  _zoomIdx=idx;
+  var zoom=document.getElementById('photo-zoom');
+  zoom.style.display='flex';
+  updateZoom();
+}
+
+function updateZoom(){
+  var id=_zoomIds[_zoomIdx].trim();
+  document.getElementById('zoom-img').src='https://drive.google.com/thumbnail?id='+id+'&sz=w1600';
+  document.getElementById('zoom-counter').textContent=(_zoomIdx+1)+' / '+_zoomIds.length;
+  document.getElementById('zoom-prev').style.display=_zoomIdx>0?'':'none';
+  document.getElementById('zoom-next').style.display=_zoomIdx<_zoomIds.length-1?'':'none';
+}
+
+function zoomNav(dir){
+  _zoomIdx+=dir;
+  if(_zoomIdx<0)_zoomIdx=0;
+  if(_zoomIdx>=_zoomIds.length)_zoomIdx=_zoomIds.length-1;
+  updateZoom();
+}
+
+function closePhotoZoom(){
+  document.getElementById('photo-zoom').style.display='none';
 }
 
 function toggleLock(i){
@@ -1177,21 +1196,9 @@ function readPhotoForEdit(f){
         var w=img.width,h=img.height;
         var MAX=1024;
         if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
-        var sw=w,sh=h;
-        if(orient>=5&&orient<=8){canvas.width=sh;canvas.height=sw;}
-        else{canvas.width=sw;canvas.height=sh;}
-        ctx.save();
-        switch(orient){
-          case 2:ctx.transform(-1,0,0,1,sw,0);ctx.drawImage(img,0,0,sw,sh);break;
-          case 3:ctx.transform(-1,0,0,-1,sw,sh);ctx.drawImage(img,0,0,sw,sh);break;
-          case 4:ctx.transform(1,0,0,-1,0,sh);ctx.drawImage(img,0,0,sw,sh);break;
-          case 5:ctx.transform(0,1,1,0,0,0);ctx.drawImage(img,0,0,sw,sh);break;
-          case 6:ctx.translate(sh,0);ctx.rotate(Math.PI/2);ctx.drawImage(img,0,0,sw,sh);break;
-          case 7:ctx.transform(0,-1,-1,0,sh,sw);ctx.drawImage(img,0,0,sw,sh);break;
-          case 8:ctx.translate(0,sw);ctx.rotate(-Math.PI/2);ctx.drawImage(img,0,0,sw,sh);break;
-          default:ctx.drawImage(img,0,0,sw,sh);
-        }
-        ctx.restore();
+        // 不做EXIF旋轉，直接用原始圖（Drive會自動讀EXIF正確顯示）
+        canvas.width=w; canvas.height=h;
+        ctx.drawImage(img,0,0,w,h);
         var dataUrl=canvas.toDataURL('image/jpeg',0.6);
         EDIT_PHOTOS.push({dataUrl:dataUrl,type:f.type||'image/jpeg'});
         renderEditPhotos();
