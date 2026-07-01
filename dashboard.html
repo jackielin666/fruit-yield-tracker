@@ -142,20 +142,30 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)
 
 /* ── 列印專用（匯出PDF）── */
 @media print{
-  @page{size:A4 portrait;margin:10mm}
-  body{background:#fff!important;font-size:12px}
-  .topbar{position:static!important;box-shadow:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:A4 portrait;margin:8mm}
+  html,body{background:#fff!important;width:194mm!important}
+  body{font-size:11px}
+  .topbar{position:static!important;box-shadow:none!important}
   .topnav,.live-pill,#btn-pdf{display:none!important}
-  .main{max-width:100%!important;padding:0!important}
+  /* 固定內容寬度為A4可用寬度，圖表responsive會自動縮放，避免右側被切 */
+  .main{max-width:194mm!important;width:194mm!important;padding:0!important;margin:0!important}
   .selector-bar{box-shadow:none;border:1px solid #ccc}
-  /* 圖表卡片避免跨頁被切斷 */
-  .cc,.cmp-wrap,.stat,.selector-bar{break-inside:avoid;page-break-inside:avoid}
+  /* 卡片/圖表避免跨頁被切斷 */
+  .cc,.cmp-wrap,.cmp-body,.stat,.selector-bar{break-inside:avoid;page-break-inside:avoid}
+  .cmp-head{break-inside:avoid;page-break-inside:avoid}
   .sec{break-after:avoid;page-break-after:avoid}
-  /* 確保背景色與圖表顏色印出來 */
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  .stat,.cc,.cmp-head-best,.cmp-head-worst,.badge{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  /* 圖表高度稍微壓縮，一頁容納更多 */
-  .ch300{height:240px!important}
+  /* 圖表容器與canvas強制不超過內容寬度 */
+  .cc-body{padding:10px!important}
+  .cc-body canvas{max-width:100%!important;height:auto!important}
+  .ch300{height:210px!important}
+  /* KPI改3欄較緊湊 */
+  .stat-row{gap:8px}
+  .stat-val{font-size:22px}
+  /* 明細表字體縮小確保完整 */
+  .btbl{font-size:10px}
+  .btbl th,.btbl td{padding:6px 7px}
+  /* 顏色完整印出 */
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
 }
 </style>
 </head>
@@ -794,15 +804,28 @@ function mk(id,cfg){
 
 // ── 一鍵匯出 PDF（改用瀏覽器原生列印，最穩定，格式不跑掉）──
 function exportPDF(){
-  // 設定列印檔名（瀏覽器另存PDF時的預設檔名）
   var d=new Date();
   var dateStr=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
   var origTitle=document.title;
   document.title='五惠「'+(SEL_FRUIT||'全部')+'」原料處理_'+dateStr;
-  // 觸發列印
-  window.print();
-  // 還原標題
-  setTimeout(function(){document.title=origTitle;},500);
+
+  // 列印前：讓所有 Chart.js 圖表重新 resize 以適配 A4 列印寬度
+  function resizeCharts(){
+    Object.keys(CH).forEach(function(k){if(CH[k])CH[k].resize();});
+  }
+  // 監聽列印前後事件，確保圖表尺寸正確
+  var beforeH=function(){setTimeout(resizeCharts,10);};
+  var afterH=function(){
+    setTimeout(function(){resizeCharts();document.title=origTitle;},50);
+    window.removeEventListener('beforeprint',beforeH);
+    window.removeEventListener('afterprint',afterH);
+  };
+  window.addEventListener('beforeprint',beforeH);
+  window.addEventListener('afterprint',afterH);
+
+  // 先觸發一次resize讓圖表縮小，稍等再列印
+  resizeCharts();
+  setTimeout(function(){window.print();},350);
 }
 </script>
 </body>
