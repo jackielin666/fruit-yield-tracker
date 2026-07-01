@@ -169,7 +169,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)
     </div>
   </div>
 
-  <!-- 三段堆疊圖（單一產出品種才顯示）-->
+  <!-- 三段堆疊圖（單一產出品種）-->
   <div id="stacked-section">
     <div class="sec"><div class="sec-lbl">原料去向分析（步留 + 耗損 + 不良 = 100%）</div></div>
     <div class="cc">
@@ -235,7 +235,7 @@ var FC={
 
 // MULTI_OUT（含耗損，key與Sheets作業類型完全一致）
 var MULTI_OUT={
-  '柚子-剝柚子（取皮肉）':{
+  '柚子-剝柚子':{
     title:'柚子剝柚子 — 產出結構',
     parts:[
       {key:'skin',label:'柚皮',col:'#c8d840'},
@@ -279,11 +279,11 @@ var TANGERINE_DETAIL={
 };
 
 var BUILTIN=[
-  {id:'B001',date:'2024/09/06',fruit:'柚子',op:'剝柚子（取皮肉）',raw:2000,out:1339,def:26,yr:67.0,dr:1.3,lr:31.7,workers:20,mh:70,eff:7.9,notes:'廠內人員'},
-  {id:'B002',date:'2024/09/07',fruit:'柚子',op:'剝柚子（取皮肉）',raw:5000,out:3409,def:83,yr:68.2,dr:1.7,lr:30.1,workers:0,mh:0,eff:0,notes:'外勞作業'},
-  {id:'B003',date:'2024/09/11',fruit:'柚子',op:'剝柚子（取皮肉）',raw:1000,out:631,def:29,yr:63.1,dr:2.9,lr:34.0,workers:0,mh:0,eff:0,notes:'外勞作業'},
-  {id:'B004',date:'2024/09/13',fruit:'柚子',op:'剝柚子（取皮肉）',raw:7200,out:4992,def:133,yr:69.3,dr:1.8,lr:28.9,workers:0,mh:0,eff:0,notes:'開放日'},
-  {id:'B005',date:'2024/09/18',fruit:'柚子',op:'剝柚子（取皮肉）',raw:1000,out:677.3,def:21.7,yr:67.7,dr:2.2,lr:30.1,workers:0,mh:0,eff:0,notes:'廠內人員'},
+  {id:'B001',date:'2024/09/06',fruit:'柚子',op:'剝柚子',raw:2000,out:1339,def:26,yr:67.0,dr:1.3,lr:31.7,workers:20,mh:70,eff:7.9,notes:'廠內人員'},
+  {id:'B002',date:'2024/09/07',fruit:'柚子',op:'剝柚子',raw:5000,out:3409,def:83,yr:68.2,dr:1.7,lr:30.1,workers:0,mh:0,eff:0,notes:'外勞作業'},
+  {id:'B003',date:'2024/09/11',fruit:'柚子',op:'剝柚子',raw:1000,out:631,def:29,yr:63.1,dr:2.9,lr:34.0,workers:0,mh:0,eff:0,notes:'外勞作業'},
+  {id:'B004',date:'2024/09/13',fruit:'柚子',op:'剝柚子',raw:7200,out:4992,def:133,yr:69.3,dr:1.8,lr:28.9,workers:0,mh:0,eff:0,notes:'開放日'},
+  {id:'B005',date:'2024/09/18',fruit:'柚子',op:'剝柚子',raw:1000,out:677.3,def:21.7,yr:67.7,dr:2.2,lr:30.1,workers:0,mh:0,eff:0,notes:'廠內人員'},
   {id:'B006',date:'2024/09/06',fruit:'柚子',op:'切柚皮條',raw:400,out:381,def:19,yr:95.25,dr:4.8,lr:0,workers:4,mh:26,eff:3.8,notes:''},
   {id:'B007',date:'2024/09/08',fruit:'柚子',op:'切柚皮條',raw:105,out:100,def:5,yr:95.24,dr:4.8,lr:0,workers:2,mh:5,eff:10.5,notes:''},
   {id:'B008',date:'2024/09/18',fruit:'柚子',op:'切柚皮條',raw:227.5,out:211.5,def:16,yr:92.97,dr:7.0,lr:0,workers:2,mh:11,eff:10.3,notes:''},
@@ -448,7 +448,7 @@ function renderStats(rows){
 
 // Breakdown（含耗損段）
 function getDetail(r){
-  if(SEL_FRUIT==='柚子'&&SEL_OP==='剝柚子（取皮肉）'){
+  if(SEL_FRUIT==='柚子'&&SEL_OP==='剝柚子'){
     var d=POMELO_DETAIL[r.id];
     if(!d&&(r.sub1||r.sub2||r.out))d={skin:r.sub1||0,neck:r.sub2||0,flesh:r.out||0,raw:r.raw};
     return d;
