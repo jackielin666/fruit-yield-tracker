@@ -191,8 +191,8 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)
     background:#fff;z-index:9999}
   .pf-left{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2d6a4f;font-weight:700}
   .pf-right{white-space:nowrap;padding-left:8px;color:#1a2e1e}
-  /* 頁碼（CSS counter）*/
-  .pf-right::after{content:"　｜　第 " counter(page) " / " counter(pages) " 頁"}
+  /* 頁碼（CSS counter）— 只顯示當前頁，避免fixed元素total計算為0 */
+  .pf-right::after{content:"　｜　第 " counter(page) " 頁"}
   /* 內容底部留空間給頁尾 */
   body{margin-bottom:16mm}
 }
@@ -417,12 +417,20 @@ function updateFooter(){
   var latestUpdater='—';
   var withSource=ALL.filter(function(r){return r.source;});
   if(withSource.length){
+    // 依日期排序取最新
     var sorted=withSource.slice().sort(function(a,b){
-      var da=(a.source.match(/\d{4}-\d{2}-\d{2}/)||[''])[0];
-      var db=(b.source.match(/\d{4}-\d{2}-\d{2}/)||[''])[0];
+      var da=(a.source.match(/\d{4}[-/]\d{2}[-/]\d{2}/)||[''])[0];
+      var db=(b.source.match(/\d{4}[-/]\d{2}[-/]\d{2}/)||[''])[0];
       return db.localeCompare(da);
     });
-    latestUpdater=sorted[0].source.replace(/\s*\d{4}-\d{2}-\d{2}.*$/,'').trim()||sorted[0].source;
+    var src=sorted[0].source;
+    // 移除時間戳（含T的ISO格式）和日期，剩下的就是姓名（支援中英文）
+    var name=src
+      .replace(/\d{4}[-/]\d{2}[-/]\d{2}T[\d:.]+Z?/g,'') // ISO時間戳
+      .replace(/\d{4}[-/]\d{2}[-/]\d{2}/g,'')            // 一般日期
+      .replace(/[T\d:.\sZ]+$/,'')                         // 尾端殘留
+      .trim();
+    latestUpdater=name||'系統';
   }
   var pu=document.getElementById('pf-updater');if(pu)pu.textContent=latestUpdater;
   var d=new Date();
