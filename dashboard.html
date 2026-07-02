@@ -142,7 +142,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)
 .empty{text-align:center;padding:60px;color:var(--ink4)}
 
 /* ── 列印專用（匯出PDF）── */
-.print-break{display:none}
 @media print{
   @page{size:A4 portrait;margin:7mm}
   html,body{background:#fff!important;width:196mm!important}
@@ -173,8 +172,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)
   /* 明細表字體縮小確保完整 */
   .btbl{font-size:9px}
   .btbl th,.btbl td{padding:5px 6px}
-  /* 第1頁分頁點：品種+KPI+堆疊圖+比較之後換頁 */
-  .print-break{display:block!important;break-before:page;page-break-before:always;height:0}
   /* 顏色完整印出 */
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
 }
@@ -232,13 +229,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)
     </div>
   </div>
 
-  <!-- 最佳/最差批三欄比較 -->
-  <div class="sec"><div class="sec-lbl">最佳批 vs 最差批</div></div>
-  <div class="cmp-wrap" id="cmp-wrap"></div>
-
-  <!-- 列印分頁點：第1頁結束（品種+KPI+堆疊圖+比較）-->
-  <div class="print-break"></div>
-
   <!-- 步留率趨勢 -->
   <div class="sec"><div class="sec-lbl">步留率趨勢</div></div>
   <div class="cc">
@@ -262,6 +252,10 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)
     </div>
     <div class="cc-body"><div class="ch300"><canvas id="chart-eff"></canvas></div></div>
   </div>
+
+  <!-- 最佳/最差批比較（移到明細表上方）-->
+  <div class="sec"><div class="sec-lbl">最佳批 vs 最差批</div></div>
+  <div class="cmp-wrap" id="cmp-wrap"></div>
 
   <!-- 批次明細表（最下方）-->
   <div class="sec"><div class="sec-lbl">批次明細記錄</div></div>
