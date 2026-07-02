@@ -191,8 +191,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)
     background:#fff;z-index:9999}
   .pf-left{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2d6a4f;font-weight:700}
   .pf-right{white-space:nowrap;padding-left:8px;color:#1a2e1e}
-  /* 頁碼（CSS counter）— 只顯示當前頁，避免fixed元素total計算為0 */
-  .pf-right::after{content:"　｜　第 " counter(page) " 頁"}
   /* 內容底部留空間給頁尾 */
   body{margin-bottom:16mm}
 }
@@ -292,7 +290,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)
 
 <!-- 列印頁尾（螢幕隱藏，僅列印顯示）-->
 <div class="print-footer" id="print-footer">
-  <span class="pf-left">五惠 原料處理記錄及分析系統　|　資料更新人員：<span id="pf-updater">—</span></span>
+  <span class="pf-left">五惠 原料處理記錄及分析系統</span>
   <span class="pf-right" id="pf-date"></span>
 </div>
 
@@ -414,25 +412,6 @@ function loadData(){
 
 // 更新頁尾：最新一筆的更新人員 + 列印日期
 function updateFooter(){
-  var latestUpdater='—';
-  var withSource=ALL.filter(function(r){return r.source;});
-  if(withSource.length){
-    // 依日期排序取最新
-    var sorted=withSource.slice().sort(function(a,b){
-      var da=(a.source.match(/\d{4}[-/]\d{2}[-/]\d{2}/)||[''])[0];
-      var db=(b.source.match(/\d{4}[-/]\d{2}[-/]\d{2}/)||[''])[0];
-      return db.localeCompare(da);
-    });
-    var src=sorted[0].source;
-    // 移除時間戳（含T的ISO格式）和日期，剩下的就是姓名（支援中英文）
-    var name=src
-      .replace(/\d{4}[-/]\d{2}[-/]\d{2}T[\d:.]+Z?/g,'') // ISO時間戳
-      .replace(/\d{4}[-/]\d{2}[-/]\d{2}/g,'')            // 一般日期
-      .replace(/[T\d:.\sZ]+$/,'')                         // 尾端殘留
-      .trim();
-    latestUpdater=name||'系統';
-  }
-  var pu=document.getElementById('pf-updater');if(pu)pu.textContent=latestUpdater;
   var d=new Date();
   var pd=document.getElementById('pf-date');
   if(pd)pd.textContent='列印日期：'+d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
